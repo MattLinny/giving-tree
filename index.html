@@ -30,7 +30,9 @@ button{font:inherit;color:inherit}
 /* header */
 .strip{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid rgba(255,244,226,.55);
   font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.head{position:relative;text-align:center;padding:64px 0 46px}
+.sec{display:flex;flex-direction:column;justify-content:center;min-height:var(--sec,720px)}
+.tree-sec{min-height:0;justify-content:flex-start;padding-top:10px}
+.head{position:relative;text-align:center;padding:0}
 h1{font:400 clamp(46px,11.5vw,104px)/.88 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:4px 5px 0 var(--red-deep)}
 .deco{position:absolute;width:74px;height:74px;filter:drop-shadow(3px 4px 0 var(--red-deep))}
 .deco.l{left:2%;top:50px;transform:rotate(-12deg)}
@@ -65,9 +67,9 @@ h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:80
 .steps b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--red-ink);color:var(--cream);font:800 14px/1 var(--wide);font-stretch:112%}
 .steps h3{font:800 13px/1.15 var(--wide);font-stretch:118%;letter-spacing:.03em;text-transform:uppercase;color:var(--red-ink)}
 .steps p{margin-top:5px;font:400 15px/1.35 var(--serif);font-variation-settings:'opsz' 14}
-.arrow{display:flex;justify-content:center;align-items:center;gap:26px;margin:6px 0 34px}
+.arrow{display:flex;justify-content:center;align-items:center;gap:26px;margin:clamp(26px,6vh,56px) auto 0;padding:8px 14px;background:none;border:0;cursor:pointer;color:inherit;border-radius:20px}
+.arrow:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
 .arrow .sp{width:30px;height:30px;overflow:visible;filter:drop-shadow(2px 3px 0 var(--red-deep))}
-.how + .arrow{margin-top:46px}
 .arrow svg.dn{animation:bob 1.9s ease-in-out infinite alternate}
 .arrow .spin{transform-box:view-box;transform-origin:50% 50%;animation:spin 18s linear infinite}
 .arrow .sp:last-child .spin{animation-duration:24s;animation-direction:reverse}
@@ -135,17 +137,14 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 
 @media (max-width:620px){
   .wrap{padding:16px 10px 32px}
-  .head{padding:34px 0 22px}
   .chips,.bar{gap:6px}
   .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
   .chip b{font-size:14px}
   .chip.go{padding:0 20px}
   .card{padding:34px 26px 28px}
   .how{padding:28px 24px 26px}
-  .head{padding:48px 0 34px}
   .deco{display:none}
-  .arrow{margin:2px 0 26px}
-  .how + .arrow{margin-top:38px}
+  .arrow{margin-top:28px}
   .arrow svg.dn{width:46px;height:56px}
   .arrow{gap:18px}
   .arrow .sp{width:24px;height:24px}
@@ -159,10 +158,13 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 </head>
 <body>
 <main class="wrap">
+  <section class="sec" id="s1">
   <header class="head">
     <svg class="deco l" id="decoL" viewBox="0 0 100 100"></svg><svg class="deco r" id="decoR" viewBox="0 0 100 100"></svg><h1><span>Christmas</span><span>Giving Tree</span></h1>
   </header>
-  <div class="arrow" aria-hidden="true"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></div>
+  <button type="button" class="arrow" data-next="s2" aria-label="Next section"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></button>
+  </section>
+  <section class="sec" id="s2">
   <section class="how" id="how">
     <div class="eyebrow">How it works</div>
     <h2>What is the Giving Tree?</h2>
@@ -177,9 +179,12 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
       <span id="submit"></span>
     </div>
   </section>
-  <div class="arrow" aria-hidden="true"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></div>
+  <button type="button" class="arrow" data-next="s3" aria-label="Next section"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></button>
+  </section>
+  <section class="sec tree-sec" id="s3">
   <div class="bar" id="bar"></div>
   <section class="stage" id="stage"></section>
+  </section>
 </main>
 <dialog id="dlg"><div class="card" id="card"></div></dialog>
 
@@ -455,6 +460,14 @@ const how=document.getElementById('how');
 new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5})}).observe(how);
 
 /* ───────── Boot ───────── */
+function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
+if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
+else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ setSec(d.height); postHeight(); } }); }
+document.querySelectorAll('.arrow').forEach(b=>b.addEventListener('click',()=>{
+  const t=document.getElementById(b.dataset.next); if(!t) return;
+  t.scrollIntoView({behavior:'smooth',block:'start'});
+  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:t.getBoundingClientRect().top+scrollY},'*');
+}));
 function postHeight(){
   if(parent===window) return;
   requestAnimationFrame(()=>parent.postMessage({type:'giving-tree:height',height:document.documentElement.scrollHeight},'*'));
