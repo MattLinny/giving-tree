@@ -120,7 +120,6 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 </head>
 <body>
 <main class="wrap">
-  <div class="strip"><span>Christmas Giving Tree</span><span id="year"></span></div>
   <header class="head">
     <svg class="deco l" id="decoL" viewBox="0 0 100 100" aria-hidden="true"></svg>
     <svg class="deco r" id="decoR" viewBox="0 0 100 100" aria-hidden="true"></svg>
@@ -396,7 +395,6 @@ async function refresh(first){
   catch(e){ if(first||!NEEDS.length) failed=true }
   renderBar(); renderTree();
 }
-document.getElementById('year').textContent=new Date().getFullYear();
 asterisk(document.getElementById('decoL'),{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12});
 asterisk(document.getElementById('decoR'),{outer:'#FFF4E2',inner:'#17694B',w:26,iw:12});
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
