@@ -30,12 +30,12 @@ button{font:inherit;color:inherit}
 /* header */
 .strip{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid rgba(255,244,226,.55);
   font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.head{position:relative;text-align:center;padding:44px 0 30px}
+.head{position:relative;text-align:center;padding:64px 0 46px}
 h1{font-weight:400;text-shadow:3px 4px 0 var(--red-deep)}
 h1 > span{display:block}
 h1 .c{font-feature-settings:'ss02'}
 h1 .big{font:400 clamp(68px,15.5vw,156px)/.82 'Allenoire',var(--display);letter-spacing:0;font-variant-ligatures:common-ligatures}
-h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;font-stretch:125%;font-size:clamp(20px,4.9vw,46px);line-height:1;letter-spacing:.14em;text-transform:uppercase}
+h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:800;font-stretch:125%;font-size:clamp(20px,4.9vw,46px);line-height:1;letter-spacing:.14em;text-transform:uppercase}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin:0 0 6px}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
@@ -50,7 +50,7 @@ h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;f
 .chip.go{background:var(--lav);border-color:var(--lav);color:var(--red-ink);text-decoration:none;padding:0 18px}
 .chip:focus-visible,.tag:focus-visible,.btn:focus-visible,.x:focus-visible{outline:3px solid var(--lav);outline-offset:3px}
 
-.how{position:relative;max-width:760px;margin:0 auto 34px;padding:34px 38px 32px;color:var(--ink);background-size:100% 100%;filter:drop-shadow(5px 7px 0 var(--red-deep))}
+.how{position:relative;max-width:760px;margin:0 auto;padding:34px 38px 32px;color:var(--ink);background-size:100% 100%;filter:drop-shadow(5px 7px 0 var(--red-deep))}
 .how .eyebrow{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--red-ink);opacity:.7}
 .how h2{margin:12px 0 10px;font:400 clamp(32px,7.5vw,46px)/.9 'Allenoire',var(--display);letter-spacing:-.01em;font-variant-ligatures:none;color:var(--red-ink)}
 .how>p{max-width:560px;font:400 17px/1.5 var(--serif);font-variation-settings:'opsz' 18}
@@ -62,6 +62,11 @@ h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;f
 .steps b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--red-ink);color:var(--cream);font:800 14px/1 var(--wide);font-stretch:112%}
 .steps h3{font:800 13px/1.15 var(--wide);font-stretch:118%;letter-spacing:.03em;text-transform:uppercase;color:var(--red-ink)}
 .steps p{margin-top:5px;font:400 15px/1.35 var(--serif);font-variation-settings:'opsz' 14}
+.arrow{display:flex;justify-content:center;align-items:center;gap:26px;margin:6px 0 34px}
+.arrow .sp{width:30px;height:30px;overflow:visible;filter:drop-shadow(2px 3px 0 var(--red-deep))}
+.arrow .sp:last-child{transform:rotate(18deg)}
+.arrow svg.dn{width:58px;height:70px;overflow:visible;fill:var(--pine);stroke:var(--cream);stroke-width:7;stroke-linejoin:round;filter:drop-shadow(4px 5px 0 var(--red-deep))}
+.bar{margin:0 0 24px}
 /* stage */
 .stage{position:relative;margin:0 auto;width:100%}
 .stage svg.tree{position:absolute;inset:0;overflow:visible;filter:drop-shadow(6px 8px 0 var(--red-deep))}
@@ -127,7 +132,12 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .chip b{font-size:14px}
   .chip.go{padding:0 20px}
   .card{padding:34px 26px 28px}
-  .how{padding:28px 24px 26px;margin-bottom:26px}
+  .how{padding:28px 24px 26px}
+  .head{padding:48px 0 34px}
+  .arrow{margin:2px 0 26px}
+  .arrow svg.dn{width:46px;height:56px}
+  .arrow{gap:18px}
+  .arrow .sp{width:24px;height:24px}
   .steps{grid-template-columns:1fr;gap:14px}
   .ask{flex-direction:column;align-items:flex-start;gap:14px}
   .how>p{font-size:16px}
@@ -141,6 +151,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   <header class="head">
     <h1><span class="big"><span class="c">C</span>hristma<span class="c">s</span></span><span class="sm2">Giving Tree</span></h1>
   </header>
+  <div class="arrow" aria-hidden="true"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></div>
   <section class="how" id="how">
     <div class="eyebrow">How it works</div>
     <h2>What is the Giving Tree?</h2>
@@ -155,6 +166,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
       <span id="submit"></span>
     </div>
   </section>
+  <div class="arrow" aria-hidden="true"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></div>
   <div class="bar" id="bar"></div>
   <section class="stage" id="stage"></section>
 </main>
@@ -442,6 +454,13 @@ async function refresh(first){
   renderBar(); renderTree();
 }
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
+document.querySelectorAll('.arrow').forEach(a=>{
+  for(const first of [true,false]){
+    const sp=document.createElementNS('http://www.w3.org/2000/svg','svg'); sp.setAttribute('class','sp'); sp.setAttribute('viewBox','0 0 100 100');
+    asterisk(sp,{outer:'#FFF4E2',inner:first?'#C9CCF6':'#17694B',w:30,iw:14});
+    first?a.prepend(sp):a.append(sp);
+  }
+});
 document.fonts&&document.fonts.ready.then(postHeight);
 refresh(true);
 if(CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),CONFIG.refreshMinutes*60000);
