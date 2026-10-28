@@ -394,6 +394,20 @@ function treeSVG(L){
     <g transform="translate(${cx-50*(P.T<130?.82:P.T>150?1.2:1)} ${y0-(P.T<130?72:P.T>150?100:84)}) scale(${P.T<130?.82:P.T>150?1.2:1})"><g id="star"></g></g>`;
 }
 
+/* ───────── Nucleus pop-ups ─────────
+   When the embed script on the church site says it can (launch:true), Nucleus form links
+   are handed to it so the site's own pop-up opens over the page. Otherwise they open in the same tab. */
+let CAN_LAUNCH=false;
+const LAUNCHER=/^https:\/\/launcher\.nucleus\.church\//;
+function viaLauncher(a){
+  a.addEventListener('click',e=>{
+    if(!CAN_LAUNCH||parent===window||!LAUNCHER.test(a.href)) return;
+    e.preventDefault();
+    if(dlg.open) dlg.close();
+    parent.postMessage({type:'giving-tree:launch',href:a.href},'*');
+  });
+}
+
 /* ───────── Render ───────── */
 const stage=document.getElementById('stage'), bar=document.getElementById('bar');
 const dlg=document.getElementById('dlg'), card=document.getElementById('card');
@@ -411,7 +425,7 @@ function renderBar(){
     chips.append(b);
   }
   if(CONFIG.submitUrl){
-    const a=document.createElement('a'); a.className='pill-btn'; a.href=CONFIG.submitUrl; a.target='_top';
+    const a=document.createElement('a'); a.className='pill-btn'; a.href=CONFIG.submitUrl; a.target='_top'; viaLauncher(a);
     a.textContent='Submit a need'; document.getElementById('submit').replaceChildren(a);
   }
 }
@@ -474,7 +488,7 @@ function openCard(n,from){
       act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${g}">Copy memo &amp; give online</a>`);
       act.lastElementChild.addEventListener('click',doCopy);
     }
-    if(hand) act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_top" href="${hand.replace(/"/g,'&quot;')}">I\u2019ll bring it</a>`);
+    if(hand){ act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_top" href="${hand.replace(/"/g,'&quot;')}">I\u2019ll bring it</a>`); viaLauncher(act.lastElementChild); }
   } else {
     act.innerHTML=`<div class="note">${n.status==='filled'?'✓ Filled':'Claimed'} · Thank you</div>`;
   }
@@ -553,7 +567,7 @@ function buildStickers(){
 buildStickers();
 function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
-else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ setSec(d.height); postHeight(); } }); }
+else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ if(d.launch) CAN_LAUNCH=true; setSec(d.height); postHeight(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
   return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="61" fill="#FFF4E2"/><circle cx="64" cy="64" r="55" fill="none" stroke="#C22A0F" stroke-width="2.5"/>`+
