@@ -138,7 +138,7 @@ const CONFIG = {
   submitUrl: 'https://launcher.nucleus.church/flow/470fa671d4f77db482be?nucleuslauncher=openflow&nlflow=470fa671d4f77db482be',
   // "Bring it in person" form (opened as-is). Falls back to contactEmail. Button hidden if both ''.
   pledgeUrl: 'https://launcher.nucleus.church/flow/47e8915ed7cf505f787d?nucleuslauncher=openflow&nlflow=47e8915ed7cf505f787d',
-  // Online giving page (opened as-is). The card shows a copyable memo line. Hidden if ''.
+  // Online giving page (new tab). The sheet's amount becomes ?default_amount=. The card shows a copyable memo line. Hidden if ''.
   giveUrl: 'https://oceanside.churchcenter.com/giving/to/alms-benevolence',
   contactEmail: '',
   refreshMinutes: 5,
@@ -305,7 +305,7 @@ function renderBar(){
     chips.append(b);
   }
   if(CONFIG.submitUrl){
-    const a=document.createElement('a'); a.className='chip go'; a.href=CONFIG.submitUrl; a.target='_blank'; a.rel='noopener';
+    const a=document.createElement('a'); a.className='chip go'; a.href=CONFIG.submitUrl; a.target='_top';
     a.textContent='Submit a need'; bar.append(a);
   }
 }
@@ -356,8 +356,12 @@ function openCard(n,from){
   if(n.status==='open'){
     const mail=CONFIG.contactEmail&&`mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(`Giving Tree · Tag ${num}`)}&body=${encodeURIComponent(`I'd like to fill: ${n.need}`)}`;
     const hand=CONFIG.pledgeUrl||mail;
-    if(hand) act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${hand.replace(/"/g,'&quot;')}">I’ll bring it</a>`);
-    if(CONFIG.giveUrl) act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_blank" rel="noopener" href="${CONFIG.giveUrl}">Give online</a>`);
+    if(hand) act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_top" href="${hand.replace(/"/g,'&quot;')}">I’ll bring it</a>`);
+    if(CONFIG.giveUrl){
+      const amt=n.amount.replace(/[^0-9.]/g,'');
+      const g=amt?`${CONFIG.giveUrl}${CONFIG.giveUrl.includes('?')?'&':'?'}default_amount=${amt}`:CONFIG.giveUrl;
+      act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_blank" rel="noopener" href="${g}">Give online</a>`);
+    }
     act.insertAdjacentHTML('beforeend','<div class="memo"><span></span><button type="button">Copy</button></div>');
     const memo=`Tag ${num} · ${n.need}`, mb=act.querySelector('.memo button');
     act.querySelector('.memo span').textContent=`Memo · ${memo}`;
