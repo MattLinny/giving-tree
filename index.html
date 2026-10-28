@@ -31,6 +31,7 @@ button{font:inherit;color:inherit}
 .sec{display:flex;flex-direction:column;justify-content:center;min-height:var(--sec,720px)}
 .tree-sec{min-height:0;justify-content:flex-start;padding-top:clamp(56px,10vh,96px)}
 .head{position:relative;text-align:center;padding:0}
+.hero{padding-top:clamp(84px,12vh,128px)}
 .title{position:relative;display:inline-block}
 h1{font:400 clamp(54px,11vw,136px)/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 h1 > span{display:block}
@@ -95,7 +96,18 @@ h1 > span{display:block}
 .k-peace{left:3%;top:24px}
 .k-rejoice{right:5%;top:420px}
 .stk.a svg{width:var(--w);height:var(--w)}
-@media (max-width:1180px){.title .stk{--k:.78}.k-glory{left:-19%}.k-joy{right:-23%}}
+@media (max-width:1239px){.title .stk{--k:.78}.k-glory{left:-19%}.k-joy{right:-23%}}
+/* wide screens: stickers run off the edges of the page */
+@media (min-width:1240px){
+  .k-merry{left:calc(50% - 50vw - 46px);top:-30%}
+  .k-glory{left:calc(50% - 50vw + 54px);top:42%}
+  .k-star{right:calc(50% - 50vw + 150px);top:-48%}
+  .k-joy{right:calc(50% - 50vw - 42px);top:8%;bottom:auto}
+  .k-born{right:calc(50% - 50vw + 64px);bottom:-72%}
+  .k-peace{left:calc(50% - 50vw - 34px)}
+  .k-rejoice{right:calc(50% - 50vw - 30px)}
+}
+@media (min-width:1600px){.stk{--k:1.18}}
 @media (max-width:879px){.stk.wide{display:none}}
 @media (max-width:620px){
   .stk,.title .stk{--k:.6}.stk:not(.m){display:none}
@@ -504,7 +516,7 @@ const STICKERS=[
   {at:'how',cls:'k-god',kind:'tk',text:'God with us.',w:176,h:96,fill:'lav',r:6,wide:1},
   {at:'how',cls:'k-adore',kind:'c',text:'Come, let us adore Him',w:116,r:-10,wide:1},
   {at:'s3',cls:'k-peace',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'cream',r:-8,wide:1},
-  {at:'s3',cls:'k-rejoice',kind:'b',text:'Rejoice!',fs:31,w:158,r:9,wide:1},
+  {at:'s3',cls:'k-rejoice',kind:'b',text:'Rejoice!',fs:25,w:158,r:9,wide:1},
 ];
 function burstSVG(w,text,fs){
   const n=14,R=68,r=52,pts=[];
