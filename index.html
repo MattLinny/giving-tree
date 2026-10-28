@@ -32,7 +32,8 @@ button{font:inherit;color:inherit}
   font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .head{position:relative;text-align:center;padding:44px 0 30px}
 h1{font-weight:400;text-shadow:3px 4px 0 var(--red-deep)}
-h1 span{display:block}
+h1 > span{display:block}
+h1 .c{font-feature-settings:'ss02'}
 h1 .big{font:400 clamp(68px,15.5vw,156px)/.82 'Allenoire',var(--display);letter-spacing:.005em}
 h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;font-stretch:125%;font-size:clamp(20px,4.9vw,46px);line-height:1;letter-spacing:.14em;text-transform:uppercase}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:30px}
@@ -117,7 +118,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 <body>
 <main class="wrap">
   <header class="head">
-    <h1><span class="big">Christmas</span><span class="sm2">Giving Tree</span></h1>
+    <h1><span class="big"><span class="c">C</span>hristmas</span><span class="sm2">Giving Tree</span></h1>
     <div class="bar" id="bar"></div>
   </header>
   <section class="stage" id="stage"></section>
