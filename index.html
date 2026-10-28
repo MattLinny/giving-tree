@@ -64,7 +64,13 @@ h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:80
 .steps p{margin-top:5px;font:400 15px/1.35 var(--serif);font-variation-settings:'opsz' 14}
 .arrow{display:flex;justify-content:center;align-items:center;gap:26px;margin:6px 0 34px}
 .arrow .sp{width:30px;height:30px;overflow:visible;filter:drop-shadow(2px 3px 0 var(--red-deep))}
-.arrow .sp:last-child{transform:rotate(18deg)}
+.how + .arrow{margin-top:46px}
+.arrow svg.dn{animation:bob 1.9s ease-in-out infinite alternate}
+.arrow .spin{transform-box:view-box;transform-origin:50% 50%;animation:spin 18s linear infinite}
+.arrow .sp:last-child .spin{animation-duration:24s;animation-direction:reverse}
+@keyframes bob{from{transform:translateY(-5px)}to{transform:translateY(7px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.arrow svg.dn,.arrow .spin{animation:none}}
 .arrow svg.dn{width:58px;height:70px;overflow:visible;fill:var(--pine);stroke:var(--cream);stroke-width:7;stroke-linejoin:round;filter:drop-shadow(4px 5px 0 var(--red-deep))}
 .bar{margin:0 0 24px}
 /* stage */
@@ -135,6 +141,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .how{padding:28px 24px 26px}
   .head{padding:48px 0 34px}
   .arrow{margin:2px 0 26px}
+  .how + .arrow{margin-top:38px}
   .arrow svg.dn{width:46px;height:56px}
   .arrow{gap:18px}
   .arrow .sp{width:24px;height:24px}
@@ -458,6 +465,7 @@ document.querySelectorAll('.arrow').forEach(a=>{
   for(const first of [true,false]){
     const sp=document.createElementNS('http://www.w3.org/2000/svg','svg'); sp.setAttribute('class','sp'); sp.setAttribute('viewBox','0 0 100 100');
     asterisk(sp,{outer:'#FFF4E2',inner:first?'#C9CCF6':'#17694B',w:30,iw:14});
+    sp.innerHTML='<g class="spin">'+sp.innerHTML+'</g>';
     first?a.prepend(sp):a.append(sp);
   }
 });
