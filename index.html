@@ -78,6 +78,17 @@ h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:80
 @media (prefers-reduced-motion:reduce){.arrow svg.dn,.arrow .spin{animation:none}}
 .arrow svg.dn{width:58px;height:70px;overflow:visible;fill:var(--pine);stroke:var(--cream);stroke-width:7;stroke-linejoin:round;filter:drop-shadow(4px 5px 0 var(--red-deep))}
 .bar{margin:0 0 24px}
+.sec{position:relative}
+.stk{position:absolute;z-index:3;pointer-events:none;--k:1;transform:rotate(var(--r,0deg)) scale(var(--k));animation:floaty var(--fd,7s) ease-in-out var(--fl,0s) infinite alternate;filter:drop-shadow(4px 5px 0 var(--red-deep))}
+.stk.tk{display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;background-size:100% 100%;color:var(--red-ink);
+  font:500 25px/1.02 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.01em}
+.stk svg{display:block;overflow:visible}
+.stk.b text{font-family:'Allenoire',var(--display);font-size:46px;fill:var(--red-ink);text-anchor:middle}
+.stk.c text{font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em;fill:var(--red-ink)}
+@keyframes floaty{from{transform:rotate(calc(var(--r,0deg) - 2.2deg)) scale(var(--k))}to{transform:rotate(calc(var(--r,0deg) + 2.2deg)) scale(var(--k))}}
+@media (max-width:879px){.stk.wide{display:none}}
+@media (max-width:620px){.stk{--k:.62}.stk:not(.m){display:none}}
+@media (prefers-reduced-motion:reduce){.stk{animation:none}}
 /* stage */
 .stage{position:relative;margin:0 auto;width:100%}
 .stage svg.tree{position:absolute;inset:0;overflow:visible;filter:drop-shadow(6px 8px 0 var(--red-deep))}
@@ -460,6 +471,44 @@ const how=document.getElementById('how');
 new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5})}).observe(how);
 
 /* ───────── Boot ───────── */
+/* ───────── Sticker decorations ───────── */
+const STICKERS=[
+  {at:'s1',kind:'tk',text:'Merry Christmas!',w:196,h:108,fill:'cream',pos:'left:4%;top:9%',r:-8,m:1},
+  {at:'s1',kind:'b',text:'Joy!',w:156,pos:'right:5%;top:8%',r:9,m:1},
+  {at:'s1',kind:'c',text:'Glory to God in the highest',w:150,pos:'left:7%;bottom:9%',r:-12},
+  {at:'s1',kind:'tk',text:'He is born.',w:176,h:96,fill:'lav',pos:'right:5%;bottom:12%',r:7,m:1},
+  {at:'how',kind:'tk',text:'God with us.',w:176,h:96,fill:'lav',pos:'right:-36px;top:-46px',r:6,wide:1},
+  {at:'how',kind:'c',text:'Come, let us adore Him',w:116,pos:'left:1%;bottom:-84px',r:-10,wide:1},
+  {at:'s3',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'cream',pos:'left:3%;top:150px',r:-7,wide:1},
+  {at:'s3',kind:'b',text:'Rejoice!',fs:31,w:158,pos:'right:4%;top:190px',r:8,wide:1},
+];
+function burstSVG(w,text,fs){
+  const n=14,R=68,r=52,pts=[];
+  for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;pts.push((75+Math.cos(a)*rad).toFixed(1)+','+(75+Math.sin(a)*rad).toFixed(1))}
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="#C9CCF6" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/><text x="75" y="${75+(fs||46)*.34}" style="font-size:${fs||46}px">${text}</text></svg>`;
+}
+function badgeSVG(w,text){
+  const t=(text.toUpperCase()+' \u00b7 ');
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="#FFF4E2"/><circle cx="75" cy="75" r="62" fill="none" stroke="#C22A0F" stroke-width="4"/>
+  <path id="p%ID%" d="M75 75m-46 0a46 46 0 1 1 92 0a46 46 0 1 1 -92 0" fill="none"/>
+  <text><textPath href="#p%ID%" startOffset="0" textLength="286" lengthAdjust="spacing">${t}</textPath></text></svg>`;
+}
+function buildStickers(){
+  STICKERS.forEach((d,i)=>{
+    const host=d.at==='how'?document.getElementById('how'):document.getElementById(d.at); if(!host) return;
+    const el=document.createElement('div');
+    el.className='stk '+d.kind+(d.wide?' wide':'')+(d.m?' m':''); el.setAttribute('aria-hidden','true');
+    el.style.cssText=d.pos+';--r:'+d.r+'deg;--fd:'+(6+(i%4))+'s;--fl:-'+(i*1.3)+'s';
+    if(d.kind==='tk'){
+      el.style.width=d.w+'px'; el.style.height=d.h+'px';
+      el.style.backgroundImage=ticketURL(d.w,d.h,{fill:d.fill==='lav'?'#C9CCF6':'#FFF4E2',stroke:'#C22A0F',r:13,d:8,sw:2.5});
+      el.textContent=d.text;
+    } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs);
+    else el.innerHTML=badgeSVG(d.w,d.text).replaceAll('%ID%',i);
+    host.append(el);
+  });
+}
+buildStickers();
 function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
 else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ setSec(d.height); postHeight(); } }); }
