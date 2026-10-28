@@ -28,19 +28,12 @@ button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
 /* header */
-.strip{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid rgba(255,244,226,.55);
-  font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .sec{display:flex;flex-direction:column;justify-content:center;min-height:var(--sec,720px)}
-.tree-sec{min-height:0;justify-content:flex-start;padding-top:10px}
+.tree-sec{min-height:0;justify-content:flex-start;padding-top:clamp(56px,10vh,96px)}
 .head{position:relative;text-align:center;padding:0}
-h1{font:400 clamp(46px,11.5vw,104px)/.88 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:4px 5px 0 var(--red-deep)}
-.deco{position:absolute;width:74px;height:74px;filter:drop-shadow(3px 4px 0 var(--red-deep))}
-.deco.l{left:2%;top:50px;transform:rotate(-12deg)}
-.deco.r{right:3%;bottom:30px;transform:rotate(10deg);width:56px;height:56px}
+.title{position:relative;display:inline-block}
+h1{font:400 clamp(54px,11vw,136px)/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 h1 > span{display:block}
-h1 .c{font-feature-settings:'ss02'}
-h1 .big{font:400 clamp(68px,15.5vw,156px)/.82 'Allenoire',var(--display);letter-spacing:0;font-variant-ligatures:common-ligatures}
-h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:800;font-stretch:125%;font-size:clamp(20px,4.9vw,46px);line-height:1;letter-spacing:.14em;text-transform:uppercase}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin:0 0 6px}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
@@ -52,7 +45,6 @@ h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:80
 .chip i.filled{background:var(--pine-deep);border-color:var(--cream)}
 .chip[aria-pressed=true]{background:var(--cream);color:var(--red-ink)}
 .chip[aria-pressed=true] i.filled{border-color:var(--cream)}
-.chip.go{background:var(--lav);border-color:var(--lav);color:var(--red-ink);text-decoration:none;padding:0 18px}
 .chip:focus-visible,.tag:focus-visible,.btn:focus-visible,.x:focus-visible{outline:3px solid var(--lav);outline-offset:3px}
 
 .how{position:relative;max-width:760px;margin:0 auto;padding:34px 38px 32px;color:var(--ink);background-size:100% 100%;filter:drop-shadow(5px 7px 0 var(--red-deep))}
@@ -62,32 +54,55 @@ h1 .sm2{margin-top:clamp(16px,3.8vw,38px);font-family:var(--wide);font-weight:80
 .steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;padding-top:20px;border-top:2px dashed rgba(194,42,15,.45)}
 .ask{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:22px;padding-top:20px;border-top:2px dashed rgba(194,42,15,.45)}
 .ask p{max-width:430px;font:400 16px/1.4 var(--serif);font-variation-settings:'opsz' 16}
-.how .chip.go{background:var(--red-ink);border-color:var(--red-ink);color:var(--cream);white-space:nowrap}
 .steps li{display:flex;gap:12px;align-items:flex-start}
 .steps b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--red-ink);color:var(--cream);font:800 14px/1 var(--wide);font-stretch:112%}
 .steps h3{font:800 13px/1.15 var(--wide);font-stretch:118%;letter-spacing:.03em;text-transform:uppercase;color:var(--red-ink)}
 .steps p{margin-top:5px;font:400 15px/1.35 var(--serif);font-variation-settings:'opsz' 14}
-.arrow{display:flex;justify-content:center;align-items:center;gap:26px;margin:clamp(26px,6vh,56px) auto 0;padding:8px 14px;background:none;border:0;cursor:pointer;color:inherit;border-radius:20px}
-.arrow:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
-.arrow .sp{width:30px;height:30px;overflow:visible;filter:drop-shadow(2px 3px 0 var(--red-deep))}
-.arrow svg.dn{animation:bob 1.9s ease-in-out infinite alternate}
-.arrow .spin{transform-box:view-box;transform-origin:50% 50%;animation:spin 18s linear infinite}
-.arrow .sp:last-child .spin{animation-duration:24s;animation-direction:reverse}
-@keyframes bob{from{transform:translateY(-5px)}to{transform:translateY(7px)}}
+.next{display:block;flex:none;width:124px;height:124px;margin:clamp(44px,9vh,92px) auto 0;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;
+  filter:drop-shadow(4px 5px 0 var(--red-deep));transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.next:hover{transform:scale(1.07) rotate(-4deg)}
+.next:focus-visible{outline:3px solid var(--lav);outline-offset:5px}
+.next svg{display:block;width:100%;height:100%;overflow:visible}
+.next .ring{transform-box:view-box;transform-origin:50% 50%;animation:spin 26s linear infinite}
+.next .dn{animation:bob 1.6s ease-in-out infinite alternate}
+.next text{font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:10.5px;letter-spacing:.08em;fill:var(--red-ink)}
+@keyframes bob{from{transform:translateY(-3px)}to{transform:translateY(4px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.arrow svg.dn,.arrow .spin{animation:none}}
-.arrow svg.dn{width:58px;height:70px;overflow:visible;fill:var(--pine);stroke:var(--cream);stroke-width:7;stroke-linejoin:round;filter:drop-shadow(4px 5px 0 var(--red-deep))}
-.bar{margin:0 0 24px}
+@media (prefers-reduced-motion:reduce){.next .ring,.next .dn{animation:none}}
+.sec-head{text-align:center;margin-bottom:26px}
+.sec-head h2{font:400 clamp(46px,8.4vw,78px)/.9 'Allenoire',var(--display);color:var(--cream);text-shadow:3px 4px 0 var(--red-deep);font-variant-ligatures:common-ligatures}
+.bar{margin:0 0 30px}
+.pill-btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;background:var(--red-ink);color:var(--cream);text-decoration:none;white-space:nowrap;
+  font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;transition:transform .15s}
+.pill-btn:hover{transform:translateY(-1px)}
+.pill-btn:focus-visible{outline:3px solid var(--red-ink);outline-offset:3px}
 .sec{position:relative}
 .stk{position:absolute;z-index:3;pointer-events:none;--k:1;transform:rotate(var(--r,0deg)) scale(var(--k));animation:floaty var(--fd,7s) ease-in-out var(--fl,0s) infinite alternate;filter:drop-shadow(4px 5px 0 var(--red-deep))}
-.stk.tk{display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;background-size:100% 100%;color:var(--red-ink);
+.stk.tk{text-transform:none;text-shadow:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;background-size:100% 100%;color:var(--red-ink);
   font:500 25px/1.02 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.01em}
 .stk svg{display:block;overflow:visible}
 .stk.b text{font-family:'Allenoire',var(--display);font-size:46px;fill:var(--red-ink);text-anchor:middle}
 .stk.c text{font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em;fill:var(--red-ink)}
 @keyframes floaty{from{transform:rotate(calc(var(--r,0deg) - 2.2deg)) scale(var(--k))}to{transform:rotate(calc(var(--r,0deg) + 2.2deg)) scale(var(--k))}}
+/* collage around the title, positioned against the title block */
+.k-merry{left:-17%;top:-50%}
+.k-glory{left:-22%;top:6%}
+.k-star{right:-5%;top:-52%}
+.k-born{right:-12%;bottom:-64%}
+.k-joy{right:-20%;bottom:-36%}
+.k-god{right:-38px;top:-48px}
+.k-adore{left:-2%;bottom:-88px}
+.k-peace{left:3%;top:24px}
+.k-rejoice{right:5%;top:420px}
+.stk.a svg{width:var(--w);height:var(--w)}
+@media (max-width:1180px){.title .stk{--k:.78}.k-glory{left:-19%}.k-joy{right:-23%}}
 @media (max-width:879px){.stk.wide{display:none}}
-@media (max-width:620px){.stk{--k:.62}.stk:not(.m){display:none}}
+@media (max-width:620px){
+  .stk,.title .stk{--k:.6}.stk:not(.m){display:none}
+  .k-merry{left:-7%;top:-132%}
+  .k-joy{right:-6%;bottom:auto;top:-150%}
+  .k-born{right:-3%;bottom:-112%}
+}
 @media (prefers-reduced-motion:reduce){.stk{animation:none}}
 /* stage */
 .stage{position:relative;margin:0 auto;width:100%}
@@ -151,14 +166,11 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .chips,.bar{gap:6px}
   .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
   .chip b{font-size:14px}
-  .chip.go{padding:0 20px}
   .card{padding:34px 26px 28px}
   .how{padding:28px 24px 26px}
-  .deco{display:none}
-  .arrow{margin-top:28px}
-  .arrow svg.dn{width:46px;height:56px}
-  .arrow{gap:18px}
-  .arrow .sp{width:24px;height:24px}
+  .next{width:104px;height:104px}
+  .sec-head{margin-bottom:20px}
+  .bar{margin-bottom:24px}
   .steps{grid-template-columns:1fr;gap:14px}
   .ask{flex-direction:column;align-items:flex-start;gap:14px}
   .how>p{font-size:16px}
@@ -169,32 +181,31 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 </head>
 <body>
 <main class="wrap">
-  <section class="sec" id="s1">
-  <header class="head">
-    <svg class="deco l" id="decoL" viewBox="0 0 100 100"></svg><svg class="deco r" id="decoR" viewBox="0 0 100 100"></svg><h1><span>Christmas</span><span>Giving Tree</span></h1>
-  </header>
-  <button type="button" class="arrow" data-next="s2" aria-label="Next section"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></button>
+  <section class="sec hero" id="s1">
+    <header class="head"><div class="title" id="title"><h1><span>Christmas</span><span>Giving Tree</span></h1></div></header>
+    <button type="button" class="next" data-next="s2" aria-label="How it works"></button>
   </section>
   <section class="sec" id="s2">
-  <section class="how" id="how">
-    <div class="eyebrow">How it works</div>
-    <h2>What is the Giving Tree?</h2>
-    <p>Each tag on the tree is a real need from someone in our community this Christmas. Pick one, fill it, and we&rsquo;ll take it off the tree.</p>
-    <ol class="steps">
-      <li><b>1</b><div><h3>Pick a tag.</h3><p>Tap one to see what&rsquo;s needed.</p></div></li>
-      <li><b>2</b><div><h3>Fill it.</h3><p>Give online, or bring it in yourself.</p></div></li>
-      <li><b>3</b><div><h3>We&rsquo;ll do the rest.</h3><p>We&rsquo;ll mark it off the tree for you.</p></div></li>
-    </ol>
-    <div class="ask">
-      <p>Submissions are open until December 6. Submit for yourself or someone you know.</p>
-      <span id="submit"></span>
-    </div>
-  </section>
-  <button type="button" class="arrow" data-next="s3" aria-label="Next section"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></button>
+    <section class="how" id="how">
+      <div class="eyebrow">How it works</div>
+      <h2>What is the Giving Tree?</h2>
+      <p>Each tag on the tree is a real need from someone in our community this Christmas. Pick one, fill it, and we&rsquo;ll take it off the tree.</p>
+      <ol class="steps">
+        <li><b>1</b><div><h3>Pick a tag.</h3><p>Tap one to see what&rsquo;s needed.</p></div></li>
+        <li><b>2</b><div><h3>Fill it.</h3><p>Give online, or bring it in yourself.</p></div></li>
+        <li><b>3</b><div><h3>We&rsquo;ll do the rest.</h3><p>We&rsquo;ll mark it off the tree for you.</p></div></li>
+      </ol>
+      <div class="ask">
+        <p>Submissions are open until December 6. Submit for yourself or someone you know.</p>
+        <span id="submit"></span>
+      </div>
+    </section>
+    <button type="button" class="next" data-next="s3" aria-label="See the tree"></button>
   </section>
   <section class="sec tree-sec" id="s3">
-  <div class="bar" id="bar"></div>
-  <section class="stage" id="stage"></section>
+    <div class="sec-head"><h2>Pick a tag.</h2></div>
+    <div class="bar" id="bar"></div>
+    <section class="stage" id="stage"></section>
   </section>
 </main>
 <dialog id="dlg"><div class="card" id="card"></div></dialog>
@@ -321,12 +332,12 @@ function layout(items,W){
     }
     tier++;
   }
-  const tiers=Math.max(tier,3); ensure(tiers-1);
+  const tiers=Math.max(tier,2); ensure(tiers-1);
   // a last tier that only used its first row is cut short, keeping its slope
   const lastH=(tier>=3&&lastRows===1)?P.hang+P.H+P.bot+8:tierH;
   const k=tiers-1;
   const bLast=a[k]+(b[k]-a[k])*(lastH/tierH);
-  return {P,placed,tiers,tierH,lastH,bLast,a,b,cx,y0,W,H:y0+k*tierH+lastH+130};
+  return {P,placed,tiers,tierH,lastH,bLast,a,b,cx,y0,W,H:y0+k*tierH+lastH+110};
 }
 function treeSVG(L){
   const {a,b,cx,y0,tierH,tiers,P,lastH,bLast}=L;
@@ -348,13 +359,21 @@ function treeSVG(L){
     const w=bw(j)*.78, y=yb(j)-14;
     boughs+=`<path d="M${cx-w} ${y-26}Q${cx} ${y+12} ${cx+w} ${y-26}" fill="none" stroke="#2E8E65" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
   }
-  const potW=P.T*.62, potH=P.T<110?54:70;
+  const g=P.T<130?.86:1.2, ground=last+66*g;
+  const gift=(x,w,h,fill,rib)=>{ const y=ground-h, bx=x+w/2;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round"/>`+
+      `<rect x="${bx-6*g}" y="${y}" width="${12*g}" height="${h}" fill="${rib}"/>`+
+      `<rect x="${x-5*g}" y="${y-3}" width="${w+10*g}" height="${15*g}" rx="3" fill="${fill}" stroke="#FFF4E2" stroke-width="5" stroke-linejoin="round"/>`+
+      `<rect x="${bx-6*g}" y="${y-3}" width="${12*g}" height="${15*g}" fill="${rib}"/>`+
+      `<path d="M${bx} ${y-4}C${bx-26*g} ${y-26*g} ${bx-28*g} ${y-1} ${bx} ${y-4}ZM${bx} ${y-4}C${bx+26*g} ${y-26*g} ${bx+28*g} ${y-1} ${bx} ${y-4}Z" fill="${rib}" stroke="#FFF4E2" stroke-width="4" stroke-linejoin="round"/>`;
+  };
   return `
-    <rect x="${cx-22}" y="${last-10}" width="44" height="52" rx="4" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
+    <rect x="${cx-18*g}" y="${last-10}" width="${36*g}" height="${44*g}" rx="3" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
     <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
     ${boughs}
-    <path d="M${cx-potW} ${last+24}H${cx+potW}L${cx+potW-14} ${last+24+potH}H${cx-potW+14}Z" fill="#C9CCF6" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
-    <path d="M${cx-potW+5} ${last+42}H${cx+potW-5}" stroke="#C22A0F" stroke-width="8"/>
+    ${gift(cx-112*g,98*g,60*g,'#C9CCF6','#C22A0F')}
+    ${gift(cx-16*g,84*g,46*g,'#FFF4E2','#17694B')}
+    ${gift(cx+58*g,52*g,30*g,'#17694B','#C9CCF6')}
     <g transform="translate(${cx-50*(P.T<130?.82:1)} ${y0-(P.T<130?72:84)}) scale(${P.T<130?.82:1})"><g id="star"></g></g>`;
 }
 
@@ -375,7 +394,7 @@ function renderBar(){
     chips.append(b);
   }
   if(CONFIG.submitUrl){
-    const a=document.createElement('a'); a.className='chip go'; a.href=CONFIG.submitUrl; a.target='_top';
+    const a=document.createElement('a'); a.className='pill-btn'; a.href=CONFIG.submitUrl; a.target='_top';
     a.textContent='Submit a need'; document.getElementById('submit').replaceChildren(a);
   }
 }
@@ -410,9 +429,10 @@ function link(base,n){
   try{const u=new URL(base); u.searchParams.set('tag',n.id); u.searchParams.set('need',n.need); return u.toString()}catch{return base}
 }
 function openCard(n,from){
+  const fromRect=from.getBoundingClientRect(), y0=window.scrollY;
   const num=String(n.id).padStart(2,'0');
   card.innerHTML=`
-    <button class="x" aria-label="Close" autofocus><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
+    <button class="x" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
     <div class="top"><span>Tag ${num}</span><span class="st ${n.status}">${LABEL[n.status]}</span></div>
     <h2></h2>
     ${n.details?'<p></p>':''}
@@ -442,8 +462,11 @@ function openCard(n,from){
     act.innerHTML=`<div class="note">${n.status==='filled'?'✓ Filled':'Claimed'} · Thank you</div>`;
   }
   card.querySelector('.x').onclick=()=>dlg.close();
+  dlg.style.top=(y0+Math.max(14,fromRect.top-60))+'px';
   dlg.showModal();
-  placeDialog(from);
+  if(window.scrollY!==y0) window.scrollTo(0,y0);
+  placeDialog(fromRect,y0);
+  card.querySelector('.x').focus({preventScroll:true});
   paintCard();
 }
 function copyText(t){
@@ -459,11 +482,11 @@ function paintCard(){
   const w=card.offsetWidth,h=card.offsetHeight; if(!w||!h) return;
   card.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
 }
-function placeDialog(from){
-  const r=from.getBoundingClientRect(), h=dlg.offsetHeight, vh=window.innerHeight;
+function placeDialog(r,y0){
+  const h=dlg.offsetHeight, vh=window.innerHeight;
   let top=r.top+r.height/2-h/2;
   top=Math.max(14,Math.min(top,vh-h-14));
-  dlg.style.top=(window.scrollY+top)+'px';
+  dlg.style.top=(y0+top)+'px';
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 new ResizeObserver(paintCard).observe(card);
@@ -473,14 +496,15 @@ new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how
 /* ───────── Boot ───────── */
 /* ───────── Sticker decorations ───────── */
 const STICKERS=[
-  {at:'s1',kind:'tk',text:'Merry Christmas!',w:196,h:108,fill:'cream',pos:'left:4%;top:9%',r:-8,m:1},
-  {at:'s1',kind:'b',text:'Joy!',w:156,pos:'right:5%;top:8%',r:9,m:1},
-  {at:'s1',kind:'c',text:'Glory to God in the highest',w:150,pos:'left:7%;bottom:9%',r:-12},
-  {at:'s1',kind:'tk',text:'He is born.',w:176,h:96,fill:'lav',pos:'right:5%;bottom:12%',r:7,m:1},
-  {at:'how',kind:'tk',text:'God with us.',w:176,h:96,fill:'lav',pos:'right:-36px;top:-46px',r:6,wide:1},
-  {at:'how',kind:'c',text:'Come, let us adore Him',w:116,pos:'left:1%;bottom:-84px',r:-10,wide:1},
-  {at:'s3',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'cream',pos:'left:3%;top:150px',r:-7,wide:1},
-  {at:'s3',kind:'b',text:'Rejoice!',fs:31,w:158,pos:'right:4%;top:190px',r:8,wide:1},
+  {at:'title',cls:'k-glory',kind:'c',text:'Glory to God in the highest',w:136,r:-14},
+  {at:'title',cls:'k-merry',kind:'tk',text:'Merry Christmas!',w:200,h:110,fill:'cream',r:-9,m:1},
+  {at:'title',cls:'k-star',kind:'a',w:74,r:14},
+  {at:'title',cls:'k-born',kind:'tk',text:'He is born.',w:180,h:98,fill:'lav',r:6,m:1},
+  {at:'title',cls:'k-joy',kind:'b',text:'Joy!',w:160,r:11,m:1},
+  {at:'how',cls:'k-god',kind:'tk',text:'God with us.',w:176,h:96,fill:'lav',r:6,wide:1},
+  {at:'how',cls:'k-adore',kind:'c',text:'Come, let us adore Him',w:116,r:-10,wide:1},
+  {at:'s3',cls:'k-peace',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'cream',r:-8,wide:1},
+  {at:'s3',cls:'k-rejoice',kind:'b',text:'Rejoice!',fs:31,w:158,r:9,wide:1},
 ];
 function burstSVG(w,text,fs){
   const n=14,R=68,r=52,pts=[];
@@ -495,15 +519,16 @@ function badgeSVG(w,text){
 }
 function buildStickers(){
   STICKERS.forEach((d,i)=>{
-    const host=d.at==='how'?document.getElementById('how'):document.getElementById(d.at); if(!host) return;
+    const host=document.getElementById(d.at); if(!host) return;
     const el=document.createElement('div');
-    el.className='stk '+d.kind+(d.wide?' wide':'')+(d.m?' m':''); el.setAttribute('aria-hidden','true');
-    el.style.cssText=d.pos+';--r:'+d.r+'deg;--fd:'+(6+(i%4))+'s;--fl:-'+(i*1.3)+'s';
+    el.className='stk '+d.kind+' '+d.cls+(d.wide?' wide':'')+(d.m?' m':''); el.setAttribute('aria-hidden','true');
+    el.style.cssText='--r:'+d.r+'deg;--w:'+d.w+'px;--fd:'+(6+(i%4))+'s;--fl:-'+(i*1.3)+'s';
     if(d.kind==='tk'){
       el.style.width=d.w+'px'; el.style.height=d.h+'px';
       el.style.backgroundImage=ticketURL(d.w,d.h,{fill:d.fill==='lav'?'#C9CCF6':'#FFF4E2',stroke:'#C22A0F',r:13,d:8,sw:2.5});
       el.textContent=d.text;
     } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs);
+    else if(d.kind==='a'){ el.innerHTML='<svg viewBox="0 0 100 100"></svg>'; asterisk(el.firstChild,{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12}); }
     else el.innerHTML=badgeSVG(d.w,d.text).replaceAll('%ID%',i);
     host.append(el);
   });
@@ -512,7 +537,14 @@ buildStickers();
 function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
 else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ setSec(d.height); postHeight(); } }); }
-document.querySelectorAll('.arrow').forEach(b=>b.addEventListener('click',()=>{
+function nextBadge(label,id){
+  const t=(label.toUpperCase()+' \u2022 ').repeat(2);
+  return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="61" fill="#FFF4E2"/><circle cx="64" cy="64" r="55" fill="none" stroke="#C22A0F" stroke-width="2.5"/>`+
+    `<g class="ring"><path id="${id}" d="M64 64m-42 0a42 42 0 1 1 84 0a42 42 0 1 1 -84 0" fill="none"/><text><textPath href="#${id}" textLength="262" lengthAdjust="spacing">${t}</textPath></text></g>`+
+    `<circle cx="64" cy="64" r="24" fill="#17694B"/><g class="dn"><path d="M59.5 51H68.5V64H76L64 78L52 64H59.5Z" fill="#FFF4E2" stroke="#FFF4E2" stroke-width="2" stroke-linejoin="round"/></g></svg>`;
+}
+document.querySelectorAll('.next').forEach((b,i)=>{ b.innerHTML=nextBadge(b.getAttribute('aria-label'),'nb'+i); });
+document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
   const t=document.getElementById(b.dataset.next); if(!t) return;
   t.scrollIntoView({behavior:'smooth',block:'start'});
   if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:t.getBoundingClientRect().top+scrollY},'*');
@@ -527,15 +559,6 @@ async function refresh(first){
   renderBar(); renderTree();
 }
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
-asterisk(document.getElementById('decoL'),{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12});asterisk(document.getElementById('decoR'),{outer:'#FFF4E2',inner:'#17694B',w:26,iw:12});
-document.querySelectorAll('.arrow').forEach(a=>{
-  for(const first of [true,false]){
-    const sp=document.createElementNS('http://www.w3.org/2000/svg','svg'); sp.setAttribute('class','sp'); sp.setAttribute('viewBox','0 0 100 100');
-    asterisk(sp,{outer:'#FFF4E2',inner:first?'#C9CCF6':'#17694B',w:30,iw:14});
-    sp.innerHTML='<g class="spin">'+sp.innerHTML+'</g>';
-    first?a.prepend(sp):a.append(sp);
-  }
-});
 document.fonts&&document.fonts.ready.then(postHeight);
 refresh(true);
 if(CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),CONFIG.refreshMinutes*60000);
