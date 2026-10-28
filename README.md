@@ -8,7 +8,7 @@ Publish: File → Share → Publish to web → the "Needs" tab → CSV → paste
 
 ## Embed
 ```html
-<iframe id="giving-tree" src="https://YOUR-USER.github.io/giving-tree/" title="Christmas Giving Tree"
+<iframe id="giving-tree" src="https://YOUR-USER.github.io/giving-tree/" allow="clipboard-write" title="Christmas Giving Tree"
   style="width:100%;border:0;min-height:900px"></iframe>
 <script>
 addEventListener('message',e=>{
