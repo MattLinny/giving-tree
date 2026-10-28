@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Christmas Giving Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Bagel+Fat+One&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E0361A; --red-deep:#A31F0A; --red-ink:#C22A0F;
+  --cream:#FFF4E2; --lav:#C9CCF6; --ink:#4A1A10;
+  --pine:#17694B; --pine-lite:#2E8E65; --pine-deep:#0B3A2A;
+  --display:'Bagel Fat One',system-ui,sans-serif;
+  --wide:'Archivo',system-ui,sans-serif;
+  --serif:'Fraunces',Georgia,serif;
+  --mono:'DM Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--red)}
+body{position:relative;overflow-x:hidden;color:var(--cream);font-family:var(--serif);-webkit-font-smoothing:antialiased;background:var(--red)}
+body::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
+  background-size:72px 72px;background-position:center top}
+body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:multiply;opacity:.38;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .06  0 0 0 0 0  0 0 0 .9 -.28'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+button{font:inherit;color:inherit}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
+
+/* header */
+.strip{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid rgba(255,244,226,.55);
+  font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.head{position:relative;text-align:center;padding:44px 0 30px}
+h1{font:400 clamp(46px,11.5vw,104px)/.88 var(--display);letter-spacing:.005em;text-transform:uppercase;
+  text-shadow:4px 5px 0 var(--red-deep)}
+h1 span{display:block}
+.deco{position:absolute;width:74px;height:74px;filter:drop-shadow(3px 4px 0 var(--red-deep))}
+.deco.l{left:2%;top:34px;transform:rotate(-12deg)}
+.deco.r{right:2%;bottom:18px;transform:rotate(10deg);width:56px;height:56px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:30px}
+.chips{display:flex;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
+  border:2px solid var(--cream);background:transparent;cursor:pointer;
+  font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;transition:background .15s,color .15s}
+.chip b{font:800 15px/1 var(--wide);font-stretch:110%;letter-spacing:0;font-variant-numeric:tabular-nums}
+.chip i{width:16px;height:16px;border-radius:5px;border:2px solid var(--red-ink);background:var(--cream)}
+.chip i.claimed{background:var(--lav)}
+.chip i.filled{background:var(--pine-deep);border-color:var(--cream)}
+.chip[aria-pressed=true]{background:var(--cream);color:var(--red-ink)}
+.chip[aria-pressed=true] i.filled{border-color:var(--cream)}
+.chip.go{background:var(--lav);border-color:var(--lav);color:var(--red-ink);text-decoration:none;padding:0 18px}
+.chip:focus-visible,.tag:focus-visible,.btn:focus-visible,.x:focus-visible{outline:3px solid var(--lav);outline-offset:3px}
+
+/* stage */
+.stage{position:relative;margin:0 auto;width:100%}
+.stage svg.tree{position:absolute;inset:0;overflow:visible;filter:drop-shadow(6px 8px 0 var(--red-deep))}
+.load{position:absolute;left:0;right:0;top:140px;text-align:center;font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.tag{position:absolute;z-index:2;width:var(--tw);height:var(--th);border:0;background:none center/100% 100% no-repeat;cursor:pointer;
+  color:var(--red-ink);text-align:center;
+  transform-origin:50% calc(var(--hang) * -1);transform:rotate(var(--rot));
+  animation:sway var(--dur) ease-in-out var(--delay) infinite alternate;
+  filter:drop-shadow(0 3px 0 rgba(6,36,24,.5));transition:opacity .25s,filter .25s}
+.tag::before{content:'';position:absolute;left:50%;bottom:100%;width:2px;height:var(--hang);margin-left:-1px;background:var(--cream)}
+.tag::after{content:'';position:absolute;left:50%;bottom:calc(100% + var(--hang) - 4px);width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--cream)}
+.tag .in{position:absolute;inset:0;display:flex;flex-direction:column;padding:13px 17px 10px}
+.sm .tag .in{padding:11px 12px 8px}
+.sm .tag .txt{font-stretch:108%}
+.tag .meta{display:flex;justify-content:space-between;font:500 var(--mf)/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.tag .txt{flex:1;display:flex;align-items:center;justify-content:center;padding-top:2px;
+  font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:var(--fs);line-height:1.12;text-transform:uppercase}
+.tag .txt span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tag.filled{color:var(--cream)}
+.tag.filled .txt span{text-decoration:line-through;text-decoration-thickness:1.5px}
+.tag:hover,.tag:focus-visible{animation:none;transform:rotate(0) scale(1.06);z-index:4;filter:drop-shadow(0 6px 0 rgba(6,36,24,.5))}
+.stage[data-f] .tag{opacity:.3}
+.stage[data-f=open] .tag.open,.stage[data-f=claimed] .tag.claimed,.stage[data-f=filled] .tag.filled{opacity:1}
+@keyframes sway{from{transform:rotate(calc(var(--rot) - 1.8deg))}to{transform:rotate(calc(var(--rot) + 1.8deg))}}
+@media (prefers-reduced-motion:reduce){.tag{animation:none}}
+
+/* modal */
+dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%);width:min(92vw,440px);max-width:none;max-height:none;
+  border:0;padding:0;background:transparent;overflow:visible;color:var(--ink)}
+dialog::backdrop{background:rgba(96,14,2,.6)}
+.card{position:relative;padding:36px 34px 32px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep))}
+.card .top{display:flex;justify-content:space-between;align-items:center;font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink)}
+.pill{padding:6px 11px;border-radius:999px;background:var(--red-ink);color:var(--cream)}
+.pill.claimed{background:var(--lav);color:var(--red-ink);box-shadow:inset 0 0 0 2px var(--red-ink)}
+.pill.filled{background:var(--pine);color:var(--cream)}
+.card h2{margin:20px 0 12px;font:400 clamp(28px,7vw,36px)/1.04 var(--display);color:var(--red-ink)}
+.card p{font:400 17px/1.5 var(--serif);font-variation-settings:'opsz' 18}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.facts span{padding:6px 10px;border-radius:6px;border:1.5px solid var(--red-ink);color:var(--red-ink);font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.actions{display:grid;gap:10px;margin-top:24px}
+.btn{display:flex;align-items:center;justify-content:center;height:50px;border-radius:999px;border:2px solid var(--red-ink);
+  font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:13px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.btn.primary{background:var(--red-ink);color:var(--cream)}
+.btn.ghost{background:transparent;color:var(--red-ink)}
+.btn:hover{transform:translateY(-1px)}
+.note{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:999px;border:2px dashed var(--red-ink);
+  color:var(--red-ink);font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.x{position:absolute;top:-8px;right:-8px;width:42px;height:42px;border-radius:50%;border:3px solid var(--cream);background:var(--red-ink);color:var(--cream);cursor:pointer;display:grid;place-items:center}
+.x svg{width:16px;height:16px}
+
+@media (max-width:620px){
+  .wrap{padding:16px 10px 32px}
+  .head{padding:34px 0 22px}
+  .deco{display:none}
+  .chips,.bar{gap:8px}
+  .chip{height:36px;padding:0 11px 0 9px;gap:7px;font-size:10.5px}
+  .chip b{font-size:14px}
+  .chip.go{padding:0 20px}
+  .card{padding:34px 26px 28px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="strip"><span>Christmas Giving Tree</span><span id="year"></span></div>
+  <header class="head">
+    <svg class="deco l" id="decoL" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    <svg class="deco r" id="decoR" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    <h1><span>Christmas</span><span>Giving Tree</span></h1>
+    <div class="bar" id="bar"></div>
+  </header>
+  <section class="stage" id="stage"></section>
+</main>
+<dialog id="dlg"><div class="card" id="card"></div></dialog>
+
+<script>
+/* ───────── Config ───────── */
+const CONFIG = {
+  // Google Sheet → File → Share → Publish to web → CSV. Leave '' to show the sample tags.
+  sheetCsvUrl: '',
+  // Where people submit a need (Nucleus form). Hidden if ''.
+  submitUrl: 'https://example.com/submit-a-need',
+  // "Bring it in person" form. ?tag=ID&need=… is appended. Falls back to contactEmail.
+  pledgeUrl: 'https://example.com/pledge',
+  // Online giving page. ?tag=ID&need=… is appended. Hidden if ''.
+  giveUrl: 'https://example.com/give',
+  contactEmail: '',
+  refreshMinutes: 5,
+};
+
+/* Sheet columns: id, need, details, for, amount, status
+   status: open | claimed | filled   (removed / hidden / blank-need rows are not shown) */
+const SAMPLE = [
+  {id:1, need:'Gifts for my 3 kids', details:'Two boys (6 and 9) and a girl (4). Toys, books or art supplies they would enjoy.', for:'Family of 4', status:'open'},
+  {id:2, need:"Winter boots, women's 9", details:'Waterproof and warm. Needed for work and walking the kids to school.', for:'Single mom', status:'open'},
+  {id:3, need:'Grocery gift card', details:'Help getting through the holidays and the January stretch.', for:'Family of 5', amount:'100', status:'claimed'},
+  {id:4, need:'Warm coat, teen boy', details:'Size men’s medium. Outgrew last year’s.', for:'Family of 3', status:'open'},
+  {id:5, need:'Diapers & wipes', details:'Size 4 diapers and a few packs of wipes.', for:'New parents', status:'filled'},
+  {id:6, need:'Space heater', details:'The bedroom gets very cold at night.', for:'Senior', status:'open'},
+  {id:7, need:'Bus pass for January', details:'A monthly pass to get to work without missing shifts.', for:'Young adult', amount:'75', status:'open'},
+  {id:8, need:'Christmas dinner groceries', details:'Turkey and all the fixings for a family of six.', for:'Family of 6', status:'claimed'},
+  {id:9, need:'Help with a car repair', details:'Brakes need work before the roads get icy.', for:'Family of 4', amount:'300', status:'open'},
+  {id:10, need:'Art kit, 8-year-old', details:'Markers, paper and paint for a kid who draws all day.', for:'Family of 3', status:'open'},
+  {id:11, need:'Phone bill help', details:'One month covered keeps a job-search line open.', for:'Job seeker', amount:'60', status:'open'},
+  {id:12, need:'Baby clothes, 6–12 mo', details:'Sleepers and warm layers for a winter baby.', for:'New parents', status:'filled'},
+  {id:13, need:'Bike for a 10-year-old', details:'Helmet too, if possible.', for:'Family of 4', status:'open'},
+  {id:14, need:'Warm blankets', details:'Two or three big ones for a drafty apartment.', for:'Senior', status:'open'},
+  {id:15, need:'School supplies', details:'Backpack, binders and pens for the new term.', for:'Family of 3', status:'filled'},
+  {id:16, need:'Winter tires', details:'A set of four so work commutes stay safe.', for:'Family of 4', amount:'600', status:'open'},
+  {id:17, need:'Slippers & socks', details:'Warm ones, for everyone in the house.', for:'Family of 5', status:'open'},
+  {id:18, need:'Board game night', details:'A game the whole family can play together.', for:'Family of 4', status:'open'},
+  {id:19, need:'Laundry & cleaning supplies', details:'Soap, detergent and basics to restock.', for:'Single dad', status:'claimed'},
+  {id:20, need:'Gas card', details:'Covers a few weeks of driving to work.', for:'Family of 2', amount:'50', status:'open'},
+  {id:21, need:'Stocking stuffers, 2 teens', details:'Small things — candy, earbuds, a good pair of gloves.', for:'Family of 4', status:'open'},
+  {id:22, need:'A Christmas tree', details:'We would love one of our own this year.', for:'Family of 3', status:'open'},
+];
+
+/* ───────── Data ───────── */
+const LABEL = {open:'Open', claimed:'Claimed', filled:'Filled'};
+const STATUS_MAP = {open:'open', '':'open', claimed:'claimed', taken:'claimed', pledged:'claimed', filled:'filled', done:'filled', complete:'filled', completed:'filled'};
+
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cell+='"';i++} else q=false } else cell+=c }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(cell); cell='' }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(cell); rows.push(row); row=[]; cell='' }
+    else cell+=c;
+  }
+  if(cell||row.length){ row.push(cell); rows.push(row) }
+  return rows;
+}
+function normalize(list){
+  return list.map((n,i)=>{
+    const st=String(n.status||'').trim().toLowerCase();
+    return {id:String(n.id||i+1).trim(), need:String(n.need||'').trim(), details:String(n.details||'').trim(),
+            for:String(n.for||'').trim(), amount:String(n.amount||'').trim(), status:STATUS_MAP[st]}; // undefined => hidden
+  }).filter(n=>n.need && n.status);
+}
+async function loadNeeds(){
+  if(!CONFIG.sheetCsvUrl) return normalize(SAMPLE);
+  const r=await fetch(CONFIG.sheetCsvUrl,{cache:'no-store'});
+  if(!r.ok) throw new Error(r.status);
+  const rows=parseCSV(await r.text()).filter(r=>r.some(c=>c.trim()));
+  const head=rows.shift().map(h=>h.trim().toLowerCase());
+  return normalize(rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]||'']))));
+}
+
+/* ───────── Shapes ───────── */
+const THEME = {
+  open:   {fill:'#FFF4E2', stroke:'#C22A0F'},
+  claimed:{fill:'#C9CCF6', stroke:'#C22A0F'},
+  filled: {fill:'#0B3A2A', stroke:'#FFF4E2'},
+};
+function ticketURL(w,h,{fill,stroke,r=10,d=6,sw=2}){
+  const R=r+d, k=Math.sqrt(R*R-d*d);
+  const o=`M${r} 0H${w-r}A${r} ${r} 0 0 0 ${w} ${r}V${h-r}A${r} ${r} 0 0 0 ${w-r} ${h}H${r}A${r} ${r} 0 0 0 0 ${h-r}V${r}A${r} ${r} 0 0 0 ${r} 0Z`;
+  const i=`M${k} ${d}H${w-k}A${R} ${R} 0 0 0 ${w-d} ${k}V${h-k}A${R} ${R} 0 0 0 ${w-k} ${h-d}H${k}A${R} ${R} 0 0 0 ${d} ${h-k}V${k}A${R} ${R} 0 0 0 ${k} ${d}Z`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${o}" fill="${fill}"/><path d="${i}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+function asterisk(el,{outer='#FFF4E2',inner='#E0361A',w=24,iw=11}={}){
+  const arms=[90,30,150].map(a=>{const r=a*Math.PI/180,x=Math.cos(r)*30,y=Math.sin(r)*30;return `M${50-x} ${50-y}L${50+x} ${50+y}`}).join('');
+  el.innerHTML=`<path d="${arms}" stroke="${outer}" stroke-width="${w}" stroke-linecap="round" fill="none"/><path d="${arms}" stroke="${inner}" stroke-width="${iw}" stroke-linecap="round" fill="none"/>`;
+}
+function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+
+/* ───────── Tree layout ───────── */
+function layout(items,W){
+  const m=W<560;
+  const P=m?{T:110,H:70,g:6,hang:20,pitch:96,ledge:22,pad:18,inset:8,slope:.55,bot:18,fs:10.5,mf:8.5}
+           :{T:138,H:86,g:14,hang:26,pitch:120,ledge:36,pad:26,inset:12,slope:.52,bot:22,fs:12.5,mf:9.5};
+  const bleed=m?46:0; // on phones the tree runs past the page edges
+  const y0=104, cx=W/2, maxHW=W/2+bleed-12;
+  const tierH=P.hang+P.pitch+P.H+P.bot;
+  const a=[],b=[];
+  const ensure=j=>{while(b.length<=j){const k=b.length;b[k]=Math.min(P.slope*(k+1)*tierH+P.pad,maxHW);a[k]=k?b[k-1]-P.ledge:0}};
+  const placed=[]; let idx=0, tier=0, lastRows=2;
+  while(idx<items.length && tier<80){
+    ensure(tier); lastRows=0;
+    for(let r=0;r<2&&idx<items.length;r++){
+      const off=P.hang+r*P.pitch, t=off/tierH;
+      const hw=Math.min(a[tier]+(b[tier]-a[tier])*t-P.inset, W/2-4); // tags never leave the page
+      const cap=Math.max(Math.floor((2*hw+P.g)/(P.T+P.g)),tier>2?1:0);
+      const n=Math.min(cap,items.length-idx);
+      if(n) lastRows=r+1;
+      for(let i=0;i<n;i++){
+        const item=items[idx++], h=hash(item.id);
+        const jit=[0,7,3,10,5][h%5];
+        placed.push({item, x:cx+(i-(n-1)/2)*(P.T+P.g)-P.T/2, y:y0+tier*tierH+off+jit, hang:P.hang-8+jit,
+          rot:(((h>>3)%7)-3)*.9, dur:(3.6+(h%9)*.35).toFixed(2), delay:-((h>>5)%30)/10});
+      }
+    }
+    tier++;
+  }
+  const tiers=Math.max(tier,3); ensure(tiers-1);
+  // a last tier that only used its first row is cut short, keeping its slope
+  const lastH=(tier>=3&&lastRows===1)?P.hang+P.H+P.bot+8:tierH;
+  const k=tiers-1;
+  const bLast=a[k]+(b[k]-a[k])*(lastH/tierH);
+  return {P,placed,tiers,tierH,lastH,bLast,a,b,cx,y0,W,H:y0+k*tierH+lastH+130};
+}
+function treeSVG(L){
+  const {a,b,cx,y0,tierH,tiers,P,lastH,bLast}=L;
+  const yb=j=>j===tiers-1?y0+j*tierH+lastH:y0+(j+1)*tierH, last=yb(tiers-1);
+  const bw=j=>j===tiers-1?bLast:b[j];
+  let d=`M${cx} ${y0}`;
+  for(let j=0;j<tiers;j++){
+    d+=` L${cx+bw(j)} ${yb(j)}`;
+    if(j<tiers-1) d+=` Q${cx+b[j]-P.ledge*.5} ${yb(j)+16} ${cx+a[j+1]} ${yb(j)}`;
+  }
+  d+=` Q${cx} ${last+22} ${cx-bw(tiers-1)} ${last}`;
+  for(let j=tiers-1;j>=1;j--){
+    d+=` L${cx-a[j]} ${yb(j-1)} Q${cx-b[j-1]+P.ledge*.5} ${yb(j-1)+16} ${cx-b[j-1]} ${yb(j-1)}`;
+  }
+  d+=' Z';
+  // boughs: soft curved highlights under each tier
+  let boughs='';
+  for(let j=0;j<tiers;j++){
+    const w=bw(j)*.78, y=yb(j)-14;
+    boughs+=`<path d="M${cx-w} ${y-26}Q${cx} ${y+12} ${cx+w} ${y-26}" fill="none" stroke="#2E8E65" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
+  }
+  const potW=P.T*.62, potH=P.T<110?54:70;
+  return `
+    <rect x="${cx-22}" y="${last-10}" width="44" height="52" rx="4" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
+    <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
+    ${boughs}
+    <path d="M${cx-potW} ${last+24}H${cx+potW}L${cx+potW-14} ${last+24+potH}H${cx-potW+14}Z" fill="#C9CCF6" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M${cx-potW+5} ${last+42}H${cx+potW-5}" stroke="#C22A0F" stroke-width="8"/>
+    <g transform="translate(${cx-50*(P.T<130?.82:1)} ${y0-(P.T<130?72:84)}) scale(${P.T<130?.82:1})"><g id="star"></g></g>`;
+}
+
+/* ───────── Render ───────── */
+const stage=document.getElementById('stage'), bar=document.getElementById('bar');
+const dlg=document.getElementById('dlg'), card=document.getElementById('card');
+let NEEDS=[], FILTER=null, lastW=0, failed=false;
+
+function renderBar(){
+  const c={open:0,claimed:0,filled:0}; NEEDS.forEach(n=>c[n.status]++);
+  bar.innerHTML='';
+  const chips=document.createElement('div'); chips.className='chips'; bar.append(chips);
+  for(const s of ['open','claimed','filled']){
+    const b=document.createElement('button');
+    b.className='chip'; b.setAttribute('aria-pressed',FILTER===s);
+    b.innerHTML=`<i class="${s}"></i><b>${c[s]}</b>${LABEL[s]}`;
+    b.onclick=()=>{FILTER=FILTER===s?null:s; FILTER?stage.dataset.f=FILTER:delete stage.dataset.f; renderBar()};
+    chips.append(b);
+  }
+  if(CONFIG.submitUrl){
+    const a=document.createElement('a'); a.className='chip go'; a.href=CONFIG.submitUrl; a.target='_blank'; a.rel='noopener';
+    a.textContent='Submit a need'; bar.append(a);
+  }
+}
+function renderTree(){
+  const W=Math.max(300,Math.min(stage.clientWidth||960,980)); lastW=stage.clientWidth;
+  const L=layout(NEEDS,W);
+  stage.style.height=L.H+'px'; stage.classList.toggle('sm',W<560);
+  stage.style.setProperty('--tw',L.P.T+'px'); stage.style.setProperty('--th',L.P.H+'px');
+  stage.style.setProperty('--fs',L.P.fs+'px'); stage.style.setProperty('--mf',L.P.mf+'px');
+  stage.innerHTML=`<svg class="tree" viewBox="0 0 ${W} ${L.H}" width="${W}" height="${L.H}" aria-hidden="true">${treeSVG(L)}</svg>`;
+  asterisk(stage.querySelector('#star'),{});
+  if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
+  const theme=L.P;
+  for(const p of L.placed){
+    const n=p.item, t=THEME[n.status];
+    const el=document.createElement('button');
+    el.className=`tag ${n.status}`; el.dataset.id=n.id;
+    el.setAttribute('aria-label',`Tag ${n.id}: ${n.need}. ${LABEL[n.status]}.`);
+    el.style.cssText=`left:${p.x}px;top:${p.y}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;`+
+      `background-image:${ticketURL(L.P.T,L.P.H,{...t,r:L.P.T<110?8:10,d:L.P.T<110?5:6})}`;
+    const num=String(n.id).padStart(2,'0');
+    el.innerHTML=`<span class="in"><span class="meta"><span>${num}</span><span>${n.status==='open'?'':n.status==='filled'?'✓ Filled':'Claimed'}</span></span><span class="txt"><span></span></span></span>`;
+    el.querySelector('.txt span').textContent=n.need;
+    el.onclick=()=>openCard(n,el);
+    stage.append(el);
+  }
+  postHeight();
+}
+
+/* ───────── Card ───────── */
+function link(base,n){
+  try{const u=new URL(base); u.searchParams.set('tag',n.id); u.searchParams.set('need',n.need); return u.toString()}catch{return base}
+}
+function openCard(n,from){
+  const num=String(n.id).padStart(2,'0');
+  const facts=[n.for&&`For · ${n.for}`, n.amount&&`About $${n.amount}`].filter(Boolean);
+  card.innerHTML=`
+    <button class="x" aria-label="Close" autofocus><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
+    <div class="top"><span>Tag ${num}</span><span class="pill ${n.status}">${LABEL[n.status]}</span></div>
+    <h2></h2>
+    ${n.details?'<p></p>':''}
+    ${facts.length?`<div class="facts">${facts.map(()=>'<span></span>').join('')}</div>`:''}
+    <div class="actions"></div>`;
+  card.querySelector('h2').textContent=n.need;
+  if(n.details) card.querySelector('p').textContent=n.details;
+  facts.forEach((f,i)=>card.querySelectorAll('.facts span')[i].textContent=f);
+  const act=card.querySelector('.actions');
+  if(n.status==='open'){
+    const mail=CONFIG.contactEmail&&`mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(`Giving Tree · Tag ${num}`)}&body=${encodeURIComponent(`I'd like to fill: ${n.need}`)}`;
+    const hand=CONFIG.pledgeUrl?link(CONFIG.pledgeUrl,n):mail;
+    if(hand) act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${hand.replace(/"/g,'&quot;')}">I’ll bring it</a>`);
+    if(CONFIG.giveUrl) act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_blank" rel="noopener" href="${link(CONFIG.giveUrl,n).replace(/"/g,'&quot;')}">Give online</a>`);
+  } else {
+    act.innerHTML=`<div class="note">${n.status==='filled'?'✓ Filled':'Claimed'} · Thank you</div>`;
+  }
+  card.querySelector('.x').onclick=()=>dlg.close();
+  dlg.showModal();
+  placeDialog(from);
+  paintCard();
+}
+function paintCard(){
+  const w=card.offsetWidth,h=card.offsetHeight; if(!w||!h) return;
+  card.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
+}
+function placeDialog(from){
+  const r=from.getBoundingClientRect(), h=dlg.offsetHeight, vh=window.innerHeight;
+  let top=r.top+r.height/2-h/2;
+  top=Math.max(14,Math.min(top,vh-h-14));
+  dlg.style.top=(window.scrollY+top)+'px';
+}
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+new ResizeObserver(paintCard).observe(card);
+
+/* ───────── Boot ───────── */
+function postHeight(){
+  if(parent===window) return;
+  requestAnimationFrame(()=>parent.postMessage({type:'giving-tree:height',height:document.documentElement.scrollHeight},'*'));
+}
+async function refresh(first){
+  try{ NEEDS=await loadNeeds(); failed=false }
+  catch(e){ if(first||!NEEDS.length) failed=true }
+  renderBar(); renderTree();
+}
+document.getElementById('year').textContent=new Date().getFullYear();
+asterisk(document.getElementById('decoL'),{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12});
+asterisk(document.getElementById('decoR'),{outer:'#FFF4E2',inner:'#17694B',w:26,iw:12});
+new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
+document.fonts&&document.fonts.ready.then(postHeight);
+refresh(true);
+if(CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),CONFIG.refreshMinutes*60000);
+</script>
+</body>
+</html>
