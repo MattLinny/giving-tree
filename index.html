@@ -37,7 +37,7 @@ h1{font:400 clamp(46px,11.5vw,104px)/.88 var(--display);letter-spacing:.005em;te
 h1 span{display:block}
 .deco{position:absolute;width:74px;height:74px;filter:drop-shadow(3px 4px 0 var(--red-deep))}
 .deco.l{left:2%;top:34px;transform:rotate(-12deg)}
-.deco.r{right:2%;bottom:18px;transform:rotate(10deg);width:56px;height:56px}
+.deco.r{right:3%;top:96px;transform:rotate(10deg);width:56px;height:56px}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:30px}
 .chips{display:flex;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
@@ -97,6 +97,10 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 .btn.primary{background:var(--red-ink);color:var(--cream)}
 .btn.ghost{background:transparent;color:var(--red-ink)}
 .btn:hover{transform:translateY(-1px)}
+.memo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 14px;border-radius:14px;border:2px dashed var(--red-ink);
+  color:var(--red-ink);font:500 11px/1.35 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.memo button{flex:none;height:30px;padding:0 13px;border-radius:999px;border:0;background:var(--red-ink);color:var(--cream);cursor:pointer;
+  font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .note{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:999px;border:2px dashed var(--red-ink);
   color:var(--red-ink);font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .x{position:absolute;top:-8px;right:-8px;width:42px;height:42px;border-radius:50%;border:3px solid var(--cream);background:var(--red-ink);color:var(--cream);cursor:pointer;display:grid;place-items:center}
@@ -133,11 +137,11 @@ const CONFIG = {
   // Google Sheet → File → Share → Publish to web → CSV. Leave '' to show the sample tags.
   sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRT575TUd7s-eMK0fpWyMF3u0Xh8G0BZyLwrmEzrQjLimq8WJ6dJUwsB2z9B5IrDqsJVIY-8GcduRg6/pub?gid=1894805478&single=true&output=csv',
   // Where people submit a need (Nucleus form). Hidden if ''.
-  submitUrl: 'https://example.com/submit-a-need',
-  // "Bring it in person" form. ?tag=ID&need=… is appended. Falls back to contactEmail.
-  pledgeUrl: 'https://example.com/pledge',
-  // Online giving page. ?tag=ID&need=… is appended. Hidden if ''.
-  giveUrl: 'https://example.com/give',
+  submitUrl: 'https://launcher.nucleus.church/flow/470fa671d4f77db482be?nucleuslauncher=openflow&nlflow=470fa671d4f77db482be',
+  // "Bring it in person" form. ?tag=ID&need=… is appended. Falls back to contactEmail. Button hidden if both ''.
+  pledgeUrl: '',
+  // Online giving page (opened as-is). The card shows a copyable memo line. Hidden if ''.
+  giveUrl: 'https://oceanside.churchcenter.com/giving/to/alms',
   contactEmail: '',
   refreshMinutes: 5,
 };
@@ -355,7 +359,12 @@ function openCard(n,from){
     const mail=CONFIG.contactEmail&&`mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(`Giving Tree · Tag ${num}`)}&body=${encodeURIComponent(`I'd like to fill: ${n.need}`)}`;
     const hand=CONFIG.pledgeUrl?link(CONFIG.pledgeUrl,n):mail;
     if(hand) act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${hand.replace(/"/g,'&quot;')}">I’ll bring it</a>`);
-    if(CONFIG.giveUrl) act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_blank" rel="noopener" href="${link(CONFIG.giveUrl,n).replace(/"/g,'&quot;')}">Give online</a>`);
+    if(CONFIG.giveUrl){
+      act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_blank" rel="noopener" href="${CONFIG.giveUrl}">Give online</a><div class="memo"><span></span><button type="button">Copy</button></div>`);
+      const memo=`Tag ${num} · ${n.need}`, mb=act.querySelector('.memo button');
+      act.querySelector('.memo span').textContent=`Memo · ${memo}`;
+      mb.onclick=async()=>{try{await navigator.clipboard.writeText(memo);mb.textContent='Copied'}catch{mb.textContent='Select & copy'}};
+    }
   } else {
     act.innerHTML=`<div class="note">${n.status==='filled'?'✓ Filled':'Claimed'} · Thank you</div>`;
   }
