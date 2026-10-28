@@ -31,7 +31,10 @@ button{font:inherit;color:inherit}
 .strip{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid rgba(255,244,226,.55);
   font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .head{position:relative;text-align:center;padding:64px 0 46px}
-h1{font-weight:400;text-shadow:3px 4px 0 var(--red-deep)}
+h1{font:400 clamp(46px,11.5vw,104px)/.88 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:4px 5px 0 var(--red-deep)}
+.deco{position:absolute;width:74px;height:74px;filter:drop-shadow(3px 4px 0 var(--red-deep))}
+.deco.l{left:2%;top:50px;transform:rotate(-12deg)}
+.deco.r{right:3%;bottom:30px;transform:rotate(10deg);width:56px;height:56px}
 h1 > span{display:block}
 h1 .c{font-feature-settings:'ss02'}
 h1 .big{font:400 clamp(68px,15.5vw,156px)/.82 'Allenoire',var(--display);letter-spacing:0;font-variant-ligatures:common-ligatures}
@@ -140,6 +143,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .card{padding:34px 26px 28px}
   .how{padding:28px 24px 26px}
   .head{padding:48px 0 34px}
+  .deco{display:none}
   .arrow{margin:2px 0 26px}
   .how + .arrow{margin-top:38px}
   .arrow svg.dn{width:46px;height:56px}
@@ -156,7 +160,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 <body>
 <main class="wrap">
   <header class="head">
-    <h1><span class="big"><span class="c">C</span>hristma<span class="c">s</span></span><span class="sm2">Giving Tree</span></h1>
+    <svg class="deco l" id="decoL" viewBox="0 0 100 100"></svg><svg class="deco r" id="decoR" viewBox="0 0 100 100"></svg><h1><span>Christmas</span><span>Giving Tree</span></h1>
   </header>
   <div class="arrow" aria-hidden="true"><svg class="dn" viewBox="0 0 80 98"><path d="M29 8H51V48H71L40 90L9 48H29Z"/></svg></div>
   <section class="how" id="how">
@@ -461,6 +465,7 @@ async function refresh(first){
   renderBar(); renderTree();
 }
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
+asterisk(document.getElementById('decoL'),{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12});asterisk(document.getElementById('decoR'),{outer:'#FFF4E2',inner:'#17694B',w:26,iw:12});
 document.querySelectorAll('.arrow').forEach(a=>{
   for(const first of [true,false]){
     const sp=document.createElementNS('http://www.w3.org/2000/svg','svg'); sp.setAttribute('class','sp'); sp.setAttribute('viewBox','0 0 100 100');
