@@ -50,6 +50,15 @@ h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;f
 .chip.go{background:var(--lav);border-color:var(--lav);color:var(--red-ink);text-decoration:none;padding:0 18px}
 .chip:focus-visible,.tag:focus-visible,.btn:focus-visible,.x:focus-visible{outline:3px solid var(--lav);outline-offset:3px}
 
+.how{position:relative;max-width:760px;margin:0 auto 34px;padding:34px 38px 32px;color:var(--ink);background-size:100% 100%;filter:drop-shadow(5px 7px 0 var(--red-deep))}
+.how .eyebrow{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--red-ink);opacity:.7}
+.how h2{margin:12px 0 10px;font:400 clamp(32px,7.5vw,46px)/.9 'Allenoire',var(--display);letter-spacing:-.01em;font-variant-ligatures:none;color:var(--red-ink)}
+.how>p{max-width:560px;font:400 17px/1.5 var(--serif);font-variation-settings:'opsz' 18}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;padding-top:20px;border-top:2px dashed rgba(194,42,15,.45)}
+.steps li{display:flex;gap:12px;align-items:flex-start}
+.steps b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--red-ink);color:var(--cream);font:800 14px/1 var(--wide);font-stretch:112%}
+.steps h3{font:800 13px/1.15 var(--wide);font-stretch:118%;letter-spacing:.03em;text-transform:uppercase;color:var(--red-ink)}
+.steps p{margin-top:5px;font:400 15px/1.35 var(--serif);font-variation-settings:'opsz' 14}
 /* stage */
 .stage{position:relative;margin:0 auto;width:100%}
 .stage svg.tree{position:absolute;inset:0;overflow:visible;filter:drop-shadow(6px 8px 0 var(--red-deep))}
@@ -63,9 +72,9 @@ h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;f
 .tag::after{content:'';position:absolute;left:50%;bottom:calc(100% + var(--hang) - 4px);width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--cream)}
 .tag .in{position:absolute;inset:0;display:flex;flex-direction:column;padding:13px 17px 10px}
 .sm .tag .in{padding:11px 12px 8px}
-.sm .tag .txt{font-stretch:108%}
+.sm .tag .txt{font-stretch:108%;padding:0 14px}
 .tag .meta{display:flex;justify-content:space-between;font:500 var(--mf)/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-.tag .txt{flex:1;display:flex;align-items:center;justify-content:center;padding-top:2px;
+.tag .txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 18px;
   font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:var(--fs);line-height:1.12;text-transform:uppercase}
 .tag .txt span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tag.filled{color:var(--cream)}
@@ -115,6 +124,8 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .chip b{font-size:14px}
   .chip.go{padding:0 20px}
   .card{padding:34px 26px 28px}
+  .how{padding:28px 24px 26px;margin-bottom:26px}
+  .steps{grid-template-columns:1fr;gap:14px}
 }
 </style>
 </head>
@@ -124,6 +135,16 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
     <h1><span class="big"><span class="c">C</span>hristma<span class="c">s</span></span><span class="sm2">Giving Tree</span></h1>
     <div class="bar" id="bar"></div>
   </header>
+  <section class="how" id="how">
+    <div class="eyebrow">How it works</div>
+    <h2>What is the Giving Tree?</h2>
+    <p>Each tag on the tree is a real need from someone in our community this Christmas. Pick one, fill it, and we&rsquo;ll take it off the tree.</p>
+    <ol class="steps">
+      <li><b>1</b><div><h3>Pick a tag.</h3><p>Tap one to see what&rsquo;s needed.</p></div></li>
+      <li><b>2</b><div><h3>Fill it.</h3><p>Give online, or bring it in yourself.</p></div></li>
+      <li><b>3</b><div><h3>We&rsquo;ll do the rest.</h3><p>We&rsquo;ll mark it off the tree for you.</p></div></li>
+    </ol>
+  </section>
   <section class="stage" id="stage"></section>
 </main>
 <dialog id="dlg"><div class="card" id="card"></div></dialog>
@@ -396,6 +417,8 @@ function placeDialog(from){
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 new ResizeObserver(paintCard).observe(card);
+const how=document.getElementById('how');
+new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5})}).observe(how);
 
 /* ───────── Boot ───────── */
 function postHeight(){
