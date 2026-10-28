@@ -37,7 +37,7 @@ h1 .c{font-feature-settings:'ss02'}
 h1 .big{font:400 clamp(68px,15.5vw,156px)/.82 'Allenoire',var(--display);letter-spacing:0;font-variant-ligatures:common-ligatures}
 h1 .sm2{margin-top:clamp(2px,.8vw,8px);font-family:var(--wide);font-weight:800;font-stretch:125%;font-size:clamp(20px,4.9vw,46px);line-height:1;letter-spacing:.14em;text-transform:uppercase}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:30px}
-.chips{display:flex;gap:10px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
   border:2px solid var(--cream);background:transparent;cursor:pointer;
   font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;transition:background .15s,color .15s}
@@ -81,14 +81,11 @@ dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%)
   border:0;padding:0;background:transparent;overflow:visible;color:var(--ink)}
 dialog::backdrop{background:rgba(96,14,2,.6)}
 .card{position:relative;padding:36px 34px 32px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep))}
-.card .top{display:flex;justify-content:space-between;align-items:center;font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink)}
-.pill{padding:6px 11px;border-radius:999px;background:var(--red-ink);color:var(--cream)}
-.pill.claimed{background:var(--lav);color:var(--red-ink);box-shadow:inset 0 0 0 2px var(--red-ink)}
-.pill.filled{background:var(--pine);color:var(--cream)}
-.card h2{margin:16px 0 10px;font:400 clamp(40px,10.5vw,56px)/.94 'Allenoire',var(--display);letter-spacing:0;font-variant-ligatures:none;color:var(--red-ink)}
+.card .top{display:flex;justify-content:space-between;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink);opacity:.6}
+.card .st.filled{color:var(--pine)}
+.card h2 .amt{display:inline-block;vertical-align:.22em;margin-left:.15em;padding:.32em .6em;border-radius:999px;background:var(--red-ink);color:var(--cream);font:800 .38em/1 var(--wide);font-stretch:112%;letter-spacing:.02em;white-space:nowrap}
+.card h2{margin:14px 0 10px;font:400 clamp(30px,8vw,42px)/.88 'Allenoire',var(--display);letter-spacing:-.01em;font-variant-ligatures:none;color:var(--red-ink)}
 .card p{font:400 17px/1.5 var(--serif);font-variation-settings:'opsz' 18}
-.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.facts span{padding:6px 10px;border-radius:6px;border:1.5px solid var(--red-ink);color:var(--red-ink);font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .actions{display:grid;gap:10px;margin-top:24px}
 .btn{display:flex;align-items:center;justify-content:center;height:50px;border-radius:999px;border:2px solid var(--red-ink);
   font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:13px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;cursor:pointer}
@@ -113,8 +110,8 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 @media (max-width:620px){
   .wrap{padding:16px 10px 32px}
   .head{padding:34px 0 22px}
-  .chips,.bar{gap:8px}
-  .chip{height:36px;padding:0 11px 0 9px;gap:7px;font-size:10.5px}
+  .chips,.bar{gap:6px}
+  .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
   .chip b{font-size:14px}
   .chip.go{padding:0 20px}
   .card{padding:34px 26px 28px}
@@ -174,7 +171,7 @@ const SAMPLE = [
 ];
 
 /* ───────── Data ───────── */
-const LABEL = {open:'Open', claimed:'Claimed', filled:'Filled'};
+const LABEL = {open:'Unclaimed', claimed:'Claimed', filled:'Filled'};
 const STATUS_MAP = {open:'open', '':'open', claimed:'claimed', taken:'claimed', pledged:'claimed', filled:'filled', done:'filled', complete:'filled', completed:'filled'};
 
 function parseCSV(text){
@@ -343,17 +340,16 @@ function link(base,n){
 }
 function openCard(n,from){
   const num=String(n.id).padStart(2,'0');
-  const facts=[n.for&&`For · ${n.for}`, n.amount&&`About $${n.amount}`].filter(Boolean);
   card.innerHTML=`
     <button class="x" aria-label="Close" autofocus><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
-    <div class="top"><span>Tag ${num}</span><span class="pill ${n.status}">${LABEL[n.status]}</span></div>
+    <div class="top"><span>Tag ${num}</span><span class="st ${n.status}">${LABEL[n.status]}</span></div>
     <h2></h2>
     ${n.details?'<p></p>':''}
-    ${facts.length?`<div class="facts">${facts.map(()=>'<span></span>').join('')}</div>`:''}
     <div class="actions"></div>`;
-  card.querySelector('h2').textContent=n.need;
+  const h=card.querySelector('h2'); h.textContent=n.need+' ';
+  const price=n.amount.replace(/[^0-9.]/g,'');
+  if(price&&n.status==='open'){ const sp=document.createElement('span'); sp.className='amt'; sp.textContent='$'+price; h.append(sp); }
   if(n.details) card.querySelector('p').textContent=n.details;
-  facts.forEach((f,i)=>card.querySelectorAll('.facts span')[i].textContent=f);
   const act=card.querySelector('.actions');
   if(n.status==='open'){
     const mail=CONFIG.contactEmail&&`mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(`Giving Tree · Tag ${num}`)}&body=${encodeURIComponent(`I'd like to fill: ${n.need}`)}`;
