@@ -483,22 +483,24 @@ function treeSVG(L){
       `<rect x="${bx-6*g}" y="${y}" width="${12*g}" height="${h}" fill="${rib}"/>`+
       `<rect x="${x-5*g}" y="${y-3}" width="${w+10*g}" height="${15*g}" rx="3" fill="${fill}" stroke="#FFF4E2" stroke-width="5" stroke-linejoin="round"/>`+
       `<rect x="${bx-6*g}" y="${y-3}" width="${12*g}" height="${15*g}" fill="${rib}"/>`+
-      `<path d="M${bx} ${y-4}C${bx-26*g} ${y-26*g} ${bx-28*g} ${y-1} ${bx} ${y-4}ZM${bx} ${y-4}C${bx+26*g} ${y-26*g} ${bx+28*g} ${y-1} ${bx} ${y-4}Z" fill="${rib}" stroke="#FFF4E2" stroke-width="4" stroke-linejoin="round"/>`;
+      `<path d="M${bx} ${y-4}C${bx-26*g} ${y-26*g} ${bx-28*g} ${y-1} ${bx} ${y-4}ZM${bx} ${y-4}C${bx+26*g} ${y-26*g} ${bx+28*g} ${y-1} ${bx} ${y-4}Z" fill="${rib}" stroke="#FFF4E2" stroke-width="4" stroke-linejoin="round"/>`+
+      `<path d="M${x} ${y}h${w}v${h}h${-w}ZM${x-5*g} ${y-3}h${w+10*g}v${15*g}h${-(w+10*g)}Z" fill="url(#gGrain)" opacity=".55" style="mix-blend-mode:soft-light"/>`;
   };
-  return `
+  return `<g filter="url(#rftree)">
     <rect x="${cx-18*g}" y="${last-10}" width="${36*g}" height="${44*g}" rx="3" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
     <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
-    <path d="${d}" fill="url(#gPaper)" opacity=".2" style="mix-blend-mode:soft-light"/>
+    <path d="${d}" fill="url(#gGrain)" opacity=".55" style="mix-blend-mode:soft-light"/>
     ${boughs}
     <defs>
-      <pattern id="gPaper" width="840" height="840" patternUnits="userSpaceOnUse"><image href="tex/paper.webp" width="840" height="840"/></pattern>
+      <pattern id="gGrain" width="200" height="200" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="200" height="200"/></pattern>
+      ${rough('tree',1,1)}
       <pattern id="gDots" width="${14*g}" height="${14*g}" patternUnits="userSpaceOnUse"><rect width="${14*g}" height="${14*g}" fill="#17694B"/><circle cx="${4*g}" cy="${4*g}" r="${2.2*g}" fill="#C9CCF6"/><circle cx="${11*g}" cy="${11*g}" r="${2.2*g}" fill="#C9CCF6"/></pattern>
       <pattern id="gStripe" width="${12*g}" height="${12*g}" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="${12*g}" height="${12*g}" fill="#FFF4E2"/><rect width="${5*g}" height="${12*g}" fill="#E0361A"/></pattern>
     </defs>
     ${gift(cx-112*g,98*g,60*g,'#C9CCF6','#C22A0F')}
     ${gift(cx-16*g,84*g,46*g,'url(#gStripe)','#17694B')}
     ${gift(cx+58*g,52*g,30*g,'url(#gDots)','#E8B03E')}
-    <g transform="translate(${cx-50*(sm?.9:P.T>150?1.2:1)} ${y0-(sm?78:P.T>150?100:84)}) scale(${sm?.9:P.T>150?1.2:1})"><g id="star"></g></g>`;
+    <g transform="translate(${cx-50*(sm?.9:P.T>150?1.2:1)} ${y0-(sm?78:P.T>150?100:84)}) scale(${sm?.9:P.T>150?1.2:1})"><g id="star"></g></g></g>`;
 }
 
 /* ───────── Nucleus pop-ups ─────────
@@ -548,7 +550,7 @@ function renderTree(){
   stage.style.setProperty('--fs',L.P.fs+'px'); stage.style.setProperty('--mf',L.P.mf+'px');
   stage.innerHTML=`<svg class="tree" viewBox="0 0 ${W} ${L.H}" width="${W}" height="${L.H}" aria-hidden="true">${treeSVG(L)}</svg>`;
   const top=`<polygon points="${starPts(8,46,20)}"/>`, ts=W<560?.9:L.P.T>150?1.2:1;
-  stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${riso('top',top,100,100*ts)}`;
+  stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${inked('top',top,100,100*ts)}`;
   if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
   const theme=L.P;
   for(const p of L.placed){
@@ -826,24 +828,29 @@ const STICKERS=[
 const FILL={cream:'#FFF4E2',lav:'#C9CCF6',green:'#17694B',gold:'#E8B03E'};
 const INK=f=>f==='green'?'#FFF4E2':'#C22A0F';
 function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;p.push((c+Math.cos(a)*rad).toFixed(1)+','+(c+Math.sin(a)*rad).toFixed(1))}return p.join(' ')}
-/* Riso halftone: the scanned dot screen, cut to the shape and screened on top so the ink looks printed.
-   Drawn at a fixed screen size (k × the scan) so every shape gets the same fine dot pitch. */
-function riso(id,shape,vb,w,k=.4){
-  if(id==null) return '';
-  const s=(450*k*vb/w).toFixed(1);
-  return `<clipPath id="rc${id}">${shape}</clipPath><image href="tex/dots.webp" width="${s}" height="${s}" preserveAspectRatio="none" clip-path="url(#rc${id})" style="mix-blend-mode:screen" opacity=".42"/>`;
+/* Printed look, after riso / screen-print textures: a fine 45° screen with sandy speckle laid over the ink
+   (soft-light, so it lifts and darkens the colour itself), and edges nudged off-true so they read as printed.
+   Everything is sized in screen px, so a 30px star and a 160px burst share the same grain. */
+function inked(id,shape,vb,w,a=.6){
+  const s=(200*vb/w).toFixed(1);   // the 400px scan drawn at 200 screen px: 1:1 on retina phones
+  return `<pattern id="gp${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="${s}" height="${s}"/></pattern>`+
+    shape.replace('/>',` fill="url(#gp${id})" style="mix-blend-mode:soft-light" opacity="${a}"/>`);
+}
+function rough(id,vb,w){
+  const k=vb/w;   // user units per px
+  return `<filter id="rf${id}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="${(.9/k).toFixed(3)}" numOctaves="2" seed="${typeof id==='number'?id%9:7}"/><feDisplacementMap in="SourceGraphic" scale="${(1.8*k).toFixed(2)}" xChannelSelector="R" yChannelSelector="G"/></filter>`;
 }
 function shapeSVG(kind,fill,id,w){
   const body=kind==='s8'
     ? `<polygon points="${starPts(8,46,19)}"/>`
     : `<path d="M50 4C54 38 62 46 96 50C62 54 54 62 50 96C46 62 38 54 4 50C38 46 46 38 50 4Z"/>`;
-  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g>${riso(id,body,100,w)}</svg>`;
+  return `<svg viewBox="0 0 100 100"><defs>${rough(id,100,w)}</defs><g filter="url(#rf${id})"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g>${inked(id,body,100,w)}</g></svg>`;
 }
 function burstSVG(w,text,fs,fill='lav',id){
   const n=14,R=68,r=52,pts=[];
   for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;pts.push((75+Math.cos(a)*rad).toFixed(1)+','+(75+Math.sin(a)*rad).toFixed(1))}
   const poly=`<polygon points="${pts.join(' ')}"/>`;
-  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${text?'':riso(id,poly,150,w)}<text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><defs>${rough(id,150,w)}</defs><g filter="url(#rf${id})"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${inked(id,poly,150,w,text?.4:.6)}</g><text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
 }
 function badgeSVG(w,text,fill='cream'){
   const t=(text.toUpperCase()+' \u00b7 ');
