@@ -22,11 +22,10 @@ body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--seri
 body::before{content:'';position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
   background-size:72px 72px;background-position:center top}
-/* paper fibre over the whole page: a neutral-grey scan, so soft-light adds grain without shifting the colours */
-body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.34;
-  background:url(tex/paper.webp) 0 0/840px 840px}
-html.bg-diamond body::after{background:url(tex/diamond.webp) 0 0/1000px 1000px;opacity:.2}   /* ?bg=diamond: the Brown 13 diamond screen instead */
-button{font:inherit;color:inherit}
+/* paper fibre on the red: a neutral-grey scan, so soft-light adds grain without shifting the colours.
+   It sits under the content; the tree carries its own lighter grain. */
+body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;mix-blend-mode:soft-light;opacity:.34;
+  background:url(tex/paper.webp) 0 0/840px 840px}button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
 /* header */
@@ -309,7 +308,6 @@ button.btn{width:100%;font-family:var(--wide)}
 <dialog id="dlg" aria-label="Tag details"><div class="card" id="card" tabindex="-1"></div></dialog>
 
 <script>
-if(/[?&]bg=diamond\b/.test(location.search)) document.documentElement.classList.add('bg-diamond');
 /* ───────── Config ───────── */
 const CONFIG = {
   // Google Sheet → File → Share → Publish to web → CSV. Leave '' to show the sample tags.
@@ -490,8 +488,10 @@ function treeSVG(L){
   return `
     <rect x="${cx-18*g}" y="${last-10}" width="${36*g}" height="${44*g}" rx="3" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
     <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
+    <path d="${d}" fill="url(#gPaper)" opacity=".2" style="mix-blend-mode:soft-light"/>
     ${boughs}
     <defs>
+      <pattern id="gPaper" width="840" height="840" patternUnits="userSpaceOnUse"><image href="tex/paper.webp" width="840" height="840"/></pattern>
       <pattern id="gDots" width="${14*g}" height="${14*g}" patternUnits="userSpaceOnUse"><rect width="${14*g}" height="${14*g}" fill="#17694B"/><circle cx="${4*g}" cy="${4*g}" r="${2.2*g}" fill="#C9CCF6"/><circle cx="${11*g}" cy="${11*g}" r="${2.2*g}" fill="#C9CCF6"/></pattern>
       <pattern id="gStripe" width="${12*g}" height="${12*g}" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="${12*g}" height="${12*g}" fill="#FFF4E2"/><rect width="${5*g}" height="${12*g}" fill="#E0361A"/></pattern>
     </defs>
