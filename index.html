@@ -168,7 +168,7 @@ h1 > span{display:block}
   font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:var(--fs);line-height:1.12;text-transform:uppercase}
 .tag .txt span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tag.filled{color:var(--cream)}
-.tag.filled .txt span{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(255,244,226,.5)}   /* a light strike keeps the words readable */
+.tag.filled .txt span{color:rgba(255,244,226,.72);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--cream)}   /* dimmed words under a solid strike: clearly crossed off, still readable */
 .tag:hover,.tag:focus-visible{animation:none;transform:rotate(0) scale(1.06);z-index:4;filter:drop-shadow(0 6px 0 rgba(6,36,24,.5))}
 .stage[data-f] .tag{opacity:.3}
 .stage[data-f=open] .tag.open,.stage[data-f=claimed] .tag.claimed,.stage[data-f=filled] .tag.filled{opacity:1}
@@ -279,6 +279,11 @@ button.btn{width:100%;font-family:var(--wide)}
 .tag .amt{position:absolute;right:-12px;top:-13px;z-index:1;padding:5px 10px;border-radius:999px;border:2px solid var(--cream);background:var(--red-ink);color:var(--cream);
   font-family:var(--wide);font-weight:800;font-stretch:112%;font-size:12.5px;line-height:1;letter-spacing:.02em;transform:rotate(6deg)}
 .sm .tag .amt{font-size:10.5px;padding:4px 8px;right:-9px;top:-11px}
+.tag .amt.st{font-size:10px;letter-spacing:.07em;text-transform:uppercase;padding:5px 9px 4px}
+.lg .tag .amt.st{font-size:11.5px;padding:6px 11px 5px}
+.sm .tag .amt.st{font-size:8.5px;padding:4px 7px 3px}
+.tag .amt.claimed{background:var(--lav);color:var(--red-ink)}
+.tag .amt.filled{background:var(--pine-deep);color:var(--cream)}
 .note{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:999px;border:2px dashed var(--red-ink);
   color:var(--red-ink);font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .x{position:absolute;top:-10px;right:-10px;z-index:2;width:42px;height:42px;border-radius:50%;border:3px solid var(--cream);background:var(--red-ink);color:var(--cream);cursor:pointer;display:grid;place-items:center}
@@ -291,7 +296,7 @@ button.btn{width:100%;font-family:var(--wide)}
   .next{margin-top:48px}
   .tree-sec{padding-top:64px;padding-bottom:104px}
   .sm .tag .txt{padding:0 calc(16px + var(--or,0px)) 0 calc(16px + var(--ol,0px))}
-  .sm .tag.pl .amt{right:auto;left:-9px;transform:rotate(-6deg)}
+  .sm .tag.off-r .amt{right:calc(var(--or) + 4px)}   /* a tag running off the right edge pulls its chip back on screen */
   .wrap{padding:16px 10px 32px}
   .chips,.bar{gap:6px}
   .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
@@ -608,14 +613,17 @@ function renderTree(){
   for(const p of L.placed){
     const n=p.item, t=THEME[n.status];
     const el=document.createElement('button');
-    el.className=`tag ${n.status}${p.x+L.P.T/2>L.cx+1?' pl':''}`; el.dataset.id=n.id;
+    el.className=`tag ${n.status}`; el.dataset.id=n.id;
     el.setAttribute('aria-label',`Tag ${n.id}: ${n.need}. ${LABEL[n.status]}.`);
     // tags that run off the screen keep their number, status and text inside the visible part
     const ol=Math.max(0,Math.round(-(sx+p.x))), or=Math.max(0,Math.round(sx+p.x+L.P.T-vw));
+    if(or) el.classList.add('off-r');
     el.style.cssText=`left:${p.x}px;top:${p.y}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;--ol:${ol}px;--or:${or}px;`+
       `background-image:${ticketURL(L.P.T,L.P.H,{...t,r:L.P.T<110?8:L.P.T>150?12:10,d:L.P.T<110?5:L.P.T>150?7:6})}`;
     const num=String(n.id).padStart(2,'0');
-    el.innerHTML=`<span class="in"><span class="meta"><span>${num}</span><span>${n.status==='open'?'':n.status==='filled'?'✓ Filled':'Claimed'}</span></span><span class="txt"><span></span></span></span>${n.status==='open'&&n.amount?`<span class="amt">$${n.amount.replace(/[^0-9.]/g,'')}</span>`:''}`;
+    // the corner chip: the amount on open tags, the status on claimed and filled ones (same chip, their colours)
+    const chip=n.status==='open'?(n.amount?`<span class="amt">$${n.amount.replace(/[^0-9.]/g,'')}</span>`:''):`<span class="amt st ${n.status}">${n.status==='filled'?'✓ Filled':'Claimed'}</span>`;
+    el.innerHTML=`<span class="in"><span class="meta"><span>${num}</span></span><span class="txt"><span></span></span></span>${chip}`;
     el.querySelector('.txt span').textContent=n.need;
     el.onclick=()=>openCard(n,el);
     if(!SEEN.has(String(n.id))) rv(el,.04+(p.x/W)*.22,1);

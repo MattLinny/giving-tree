@@ -30,6 +30,40 @@ function setup() {
   ensureHeaders_(ss.getSheetByName(PLEDGES) || ss.insertSheet(PLEDGES), PLEDGE_COLS);
 }
 
+/**
+ * One-off: empties the Needs and Pledges tabs (header rows, colours and status dropdowns stay) and fills
+ * Needs with gift-card tags. Pick `seedGiftCards` in the function menu and click Run. No new deployment needed.
+ */
+function seedGiftCards() {
+  const cards = [
+    // need, details, for, amount, status
+    ['Save-On-Foods gift card', 'Groceries for the holidays and the January stretch.', 'Family of 5', 200, 'open'],
+    ['Prepaid Visa gift card', 'Flexible help with bills and Christmas basics.', 'Single mom', 100, 'open'],
+    ['Chevron gas card', 'Keeps the car running for work and school drop-offs.', 'Job seeker', 75, 'open'],
+    ['Thrifty Foods gift card', 'A little extra for fresh food this month.', 'Senior', 50, 'open'],
+    ['Prepaid Visa gift card', 'Winter clothing and school supplies for the kids.', 'Family of 4', 250, 'open'],
+    ['Walmart grocery card', 'Christmas dinner and pantry staples.', 'Family of 6', 300, 'open'],
+    ['Petro-Canada gas card', 'Covers a few weeks of driving to work.', 'Single dad', 100, 'open'],
+    ['Prepaid Visa gift card', 'Help with a phone bill during a job search.', 'Young adult', 50, 'open'],
+    ['Save-On-Foods gift card', 'Formula, diapers and groceries for a new baby.', 'New parents', 150, 'open'],
+    ['Co-op gas card', 'Driving to medical appointments in town.', 'Family of 3', 150, 'claimed'],
+    ['Prepaid Visa gift card', 'A month of rent top-up after a reduced-hours stretch.', 'Family of 5', 500, 'open'],
+    ['Quality Foods gift card', 'Groceries through the holidays.', 'Family of 4', 400, 'filled'],
+    ['Shell gas card', 'Getting to church and to see family.', 'Senior', 60, 'claimed'],
+    ['Prepaid Visa gift card', 'Christmas gifts for three kids.', 'Single mom', 200, 'filled'],
+  ];
+  const needs = sheet_(NEEDS), pledges = sheet_(PLEDGES);
+  [needs, pledges].forEach(sh => {
+    if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, sh.getLastColumn()).clearContent();
+  });
+  const head = table_(needs).head, now = new Date();
+  const rows = cards.map(([need, details, who, amount, status], i) => {
+    const rec = { id: i + 1, need, details, for: who, amount, status, submitted_at: now, submitted_by: 'Care team' };
+    return head.map(h => (rec[h] === undefined ? '' : rec[h]));
+  });
+  needs.getRange(2, 1, rows.length, head.length).setValues(rows);
+}
+
 /* ── Read: the tree's public data ── */
 function doGet() {
   const { head, rows } = table_(sheet_(NEEDS));
