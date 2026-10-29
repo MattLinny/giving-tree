@@ -62,18 +62,33 @@ function seedGiftCards() {
     return head.map(h => (rec[h] === undefined ? '' : rec[h]));
   });
   needs.getRange(2, 1, rows.length, head.length).setValues(rows);
+  CacheService.getScriptCache().remove('needs');
 }
 
-/* ── Read: the tree's public data ── */
+/* ── Read: the tree's public data ──
+   The answer is cached for 30 s so a busy page doesn't re-read the sheet for every visitor. Any edit to the
+   sheet (by hand or by a form) clears the cache, so changes still show up on the next refresh. */
 function doGet() {
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('needs');
+  if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+  const out = JSON.stringify(publicNeeds_());
+  cache.put('needs', out, 30);
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+}
+
+function publicNeeds_() {
   const { head, rows } = table_(sheet_(NEEDS));
   const col = k => head.indexOf(k);
   const get = (r, k) => (col(k) < 0 ? '' : String(r[col(k)]).trim());
   const needs = rows
     .map(r => ({ id: get(r, 'id'), need: get(r, 'need'), details: get(r, 'details'), amount: get(r, 'amount'), status: get(r, 'status').toLowerCase() }))
     .filter(n => n.need && !HIDDEN.includes(n.status));
-  return json_({ needs });
+  return { needs };
 }
+
+// Simple trigger: runs on every hand edit in the sheet (no setup needed) and drops the cached tree.
+function onEdit() { CacheService.getScriptCache().remove('needs'); }
 
 /* ── Write: new needs and pledges ── */
 function doPost(e) {
@@ -83,9 +98,9 @@ function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    if (d.action === 'need') return json_(addNeed_(d));
-    if (d.action === 'pledge') return json_(addPledge_(d));
-    return json_({ ok: false, error: 'unknown_action' });
+    const res = d.action === 'need' ? addNeed_(d) : d.action === 'pledge' ? addPledge_(d) : { ok: false, error: 'unknown_action' };
+    if (res.ok) CacheService.getScriptCache().remove('needs');   // a claim shows on the tree straight away
+    return json_(res);
   } finally {
     lock.releaseLock();
   }

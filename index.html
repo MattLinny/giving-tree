@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Christmas Giving Tree</title>
-<link rel="preload" href="fonts/Allenoire.otf" as="font" type="font/otf" crossorigin>
+<!-- the hero's title font first, and an early handshake with the sheet's server -->
+<link rel="preload" href="fonts/BagelFatOne-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
 :root{
@@ -18,14 +21,11 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--red);overflow-x:clip}
-body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--serif);-webkit-font-smoothing:antialiased;background:var(--red)}
+/* the paper grain is baked into the red tile, so phones don't blend a page-tall layer on every scroll */
+body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--serif);-webkit-font-smoothing:antialiased;background:var(--red) url(tex/paper-red.webp) 0 0/750px 750px}
 body::before{content:'';position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
   background-size:72px 72px;background-position:center top}
-/* paper fibre on the red: a neutral-grey scan, so soft-light adds grain without shifting the colours.
-   It sits under the content; the tree carries its own lighter grain. */
-body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;mix-blend-mode:soft-light;opacity:.34;
-  background:url(tex/paper.webp) 0 0/1000px 1000px}
 button{font:inherit;color:inherit}
 .lede,.sec-head .help,.how h2,.card h2{text-wrap:balance}
 .how>p,.ask p,.card p,.steps p{text-wrap:pretty}
@@ -535,11 +535,11 @@ function treeSVG(L){
   };
   return `<g filter="url(#rftree)">
     <rect x="${cx-18*g}" y="${last-10}" width="${36*g}" height="${44*g}" rx="3" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
-    <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
-    <path d="${d}" fill="url(#gGrain)" opacity=".55" style="mix-blend-mode:soft-light"/>
+    <path d="${d}" fill="url(#gTree)" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
     ${boughs}
     <defs>
-      <pattern id="gGrain" width="420" height="420" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="420" height="420"/></pattern>
+      <pattern id="gGrain" width="294" height="294" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="294" height="294"/></pattern>
+      <pattern id="gTree" width="294" height="294" patternUnits="userSpaceOnUse"><rect width="294" height="294" fill="#17694B"/><image href="tex/grain-green.webp" width="294" height="294"/></pattern>
       ${rough('tree',1,1)}
       <pattern id="gDots" width="${14*g}" height="${14*g}" patternUnits="userSpaceOnUse"><rect width="${14*g}" height="${14*g}" fill="#17694B"/><circle cx="${4*g}" cy="${4*g}" r="${2.2*g}" fill="#C9CCF6"/><circle cx="${11*g}" cy="${11*g}" r="${2.2*g}" fill="#C9CCF6"/></pattern>
       <pattern id="gStripe" width="${12*g}" height="${12*g}" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="${12*g}" height="${12*g}" fill="#FFF4E2"/><rect width="${5*g}" height="${12*g}" fill="#E0361A"/></pattern>
@@ -928,7 +928,7 @@ function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i
    (soft-light, so it lifts and darkens the colour itself), and edges nudged off-true so they read as printed.
    Everything is sized in screen px, so a 30px star and a 160px burst share the same grain. */
 function inked(id,shape,vb,w,a=.6){
-  const s=(420*vb/w).toFixed(1);   // the 840px tile drawn at 420 screen px: 1:1 on retina phones
+  const s=(294*vb/w).toFixed(1);   // the 588px tile drawn at 294 screen px: 1:1 on retina phones
   return `<pattern id="gp${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="${s}" height="${s}"/></pattern>`+
     shape.replace('/>',` fill="url(#gp${id})" style="mix-blend-mode:soft-light" opacity="${a}"/>`);
 }
@@ -1067,10 +1067,16 @@ async function refresh(first){
   const data=JSON.stringify(NEEDS);
   if(!first&&data===LAST_DATA&&failed===was) return;   // nothing changed: leave the tree (and its animations) alone
   LAST_DATA=data; renderBar(); renderTree();
+  if(!failed&&NEEDS.length) try{ localStorage.setItem(CACHE_KEY,data); }catch{}
 }
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
 document.fonts&&document.fonts.ready.then(postHeight);
-refresh(true);
+/* The sheet's server takes 1–2 s to answer. Draw the tree from the last answer this browser saw straight
+   away, then swap in the fresh one (claims are still checked by the server, so a stale tag can't be double-claimed). */
+const CACHE_KEY='giving-tree:needs';
+const cached=(()=>{ try{ const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null'); return Array.isArray(c)&&c.length?c:null; }catch{ return null; } })();
+if(cached){ NEEDS=cached; LAST_DATA=JSON.stringify(NEEDS); renderBar(); renderTree(); }
+refresh(!cached);
 if(CONFIG.apiUrl||CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),(CONFIG.apiUrl?1:CONFIG.refreshMinutes)*60000);
 </script>
 </body>
