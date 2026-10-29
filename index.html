@@ -25,7 +25,8 @@ body::before{content:'';position:absolute;inset:0;pointer-events:none;
 /* paper fibre on the red: a neutral-grey scan, so soft-light adds grain without shifting the colours.
    It sits under the content; the tree carries its own lighter grain. */
 body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;mix-blend-mode:soft-light;opacity:.34;
-  background:url(tex/paper.webp) 0 0/840px 840px}button{font:inherit;color:inherit}
+  background:url(tex/paper.webp) 0 0/1000px 1000px}
+button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
 /* header */
@@ -177,7 +178,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 .card{position:relative;padding:36px 34px 32px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep))}
 /* a light kraft grain on the pop-up card, cut to the ticket shape and kept under the text */
 .card::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:multiply;opacity:.2;
-  background:url(tex/paper.webp) 0 0/560px 560px,#C99A62;background-blend-mode:soft-light;
+  background:url(tex/paper.webp) 0 0/700px 700px,#C99A62;background-blend-mode:soft-light;
   -webkit-mask:var(--tk) 0 0/100% 100% no-repeat;mask:var(--tk) 0 0/100% 100% no-repeat}
 .card .top{display:flex;justify-content:space-between;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink);opacity:.6}
 .card .st.filled{color:var(--pine)}
@@ -492,7 +493,7 @@ function treeSVG(L){
     <path d="${d}" fill="url(#gGrain)" opacity=".55" style="mix-blend-mode:soft-light"/>
     ${boughs}
     <defs>
-      <pattern id="gGrain" width="200" height="200" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="200" height="200"/></pattern>
+      <pattern id="gGrain" width="420" height="420" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="420" height="420"/></pattern>
       ${rough('tree',1,1)}
       <pattern id="gDots" width="${14*g}" height="${14*g}" patternUnits="userSpaceOnUse"><rect width="${14*g}" height="${14*g}" fill="#17694B"/><circle cx="${4*g}" cy="${4*g}" r="${2.2*g}" fill="#C9CCF6"/><circle cx="${11*g}" cy="${11*g}" r="${2.2*g}" fill="#C9CCF6"/></pattern>
       <pattern id="gStripe" width="${12*g}" height="${12*g}" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="${12*g}" height="${12*g}" fill="#FFF4E2"/><rect width="${5*g}" height="${12*g}" fill="#E0361A"/></pattern>
@@ -832,7 +833,7 @@ function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i
    (soft-light, so it lifts and darkens the colour itself), and edges nudged off-true so they read as printed.
    Everything is sized in screen px, so a 30px star and a 160px burst share the same grain. */
 function inked(id,shape,vb,w,a=.6){
-  const s=(200*vb/w).toFixed(1);   // the 400px scan drawn at 200 screen px: 1:1 on retina phones
+  const s=(420*vb/w).toFixed(1);   // the 840px tile drawn at 420 screen px: 1:1 on retina phones
   return `<pattern id="gp${id}" width="${s}" height="${s}" patternUnits="userSpaceOnUse"><image href="tex/grain.webp" width="${s}" height="${s}"/></pattern>`+
     shape.replace('/>',` fill="url(#gp${id})" style="mix-blend-mode:soft-light" opacity="${a}"/>`);
 }
