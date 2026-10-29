@@ -9,7 +9,7 @@
 <style>
 :root{
   --red:#E0361A; --red-deep:#A31F0A; --red-ink:#C22A0F;
-  --cream:#FFF4E2; --lav:#C9CCF6; --ink:#4A1A10;
+  --cream:#FFF4E2; --lav:#C9CCF6; --gold:#E8B03E; --ink:#4A1A10;
   --pine:#17694B; --pine-lite:#2E8E65; --pine-deep:#0B3A2A;
   --display:'Bagel Fat One',system-ui,sans-serif;
   --wide:'Archivo',system-ui,sans-serif;
@@ -35,6 +35,8 @@ button{font:inherit;color:inherit}
 .title{position:relative;display:inline-block}
 h1{font:400 clamp(54px,11vw,136px)/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 h1 > span{display:block}
+h1 .the{position:absolute;left:-.04em;top:-.5em;font:400 .5em/1 'Allenoire',var(--display);text-transform:none;letter-spacing:0;transform:rotate(-7deg);text-shadow:3px 4px 0 var(--red-deep)}
+.lede{max-width:540px;margin:clamp(30px,5vh,48px) auto 0;font:400 24px/1.35 var(--serif);font-variation-settings:'opsz' 36;color:var(--cream)}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin:0 0 6px}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .chip{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 16px 0 12px;border-radius:999px;
@@ -71,6 +73,7 @@ h1 > span{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.next .ring,.next .dn{animation:none}}
 .sec-head{text-align:center;margin-bottom:26px}
+.sec-head .help{margin-top:14px;font:400 22px/1.35 var(--serif);font-variation-settings:'opsz' 30;color:var(--cream)}
 .sec-head h2{font:400 clamp(46px,8.4vw,78px)/.9 'Allenoire',var(--display);color:var(--cream);text-shadow:3px 4px 0 var(--red-deep);font-variant-ligatures:common-ligatures}
 .bar{margin:0 0 30px}
 .pill-btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;background:var(--red-ink);color:var(--cream);text-decoration:none;white-space:nowrap;
@@ -82,26 +85,33 @@ h1 > span{display:block}
 .stk.tk{text-transform:none;text-shadow:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;background-size:100% 100%;color:var(--red-ink);
   font:500 25px/1.02 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.01em}
 .stk svg{display:block;overflow:visible}
-.stk.b text{font-family:'Allenoire',var(--display);font-size:46px;fill:var(--red-ink);text-anchor:middle}
-.stk.c text{font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em;fill:var(--red-ink)}
+.stk.b text{font-family:'Allenoire',var(--display);font-size:46px;text-anchor:middle}
+.stk.c text{font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em}
+.stk.s8,.stk.s4{animation-name:twinkle;filter:drop-shadow(3px 4px 0 var(--red-deep))}
+.stk.s8 svg,.stk.s4 svg{width:var(--w);height:var(--w)}
+@keyframes twinkle{from{transform:rotate(calc(var(--r,0deg) - 8deg)) scale(calc(var(--k) * .9))}to{transform:rotate(calc(var(--r,0deg) + 8deg)) scale(var(--k))}}
 @keyframes floaty{from{transform:rotate(calc(var(--r,0deg) - 2.2deg)) scale(var(--k))}to{transform:rotate(calc(var(--r,0deg) + 2.2deg)) scale(var(--k))}}
 /* collage around the title, positioned against the title block */
-.k-merry{left:-17%;top:-50%}
+.k-merry{left:-13%;bottom:-66%}
 .k-glory{left:-22%;top:6%}
-.k-star{right:-5%;top:-52%}
+.k-sp1{right:-6%;top:-50%}
+.k-sp2{right:30%;top:-44%}
 .k-born{right:-12%;bottom:-64%}
 .k-joy{right:-20%;bottom:-36%}
-.k-god{right:-38px;top:-48px}
-.k-adore{left:-2%;bottom:-88px}
+.k-h1{right:-40px;top:-46px}
+.k-h2{left:-30px;bottom:-34px}
+.k-h3{right:-16px;bottom:70px}
+.k-t1{right:21%;top:-6px}
+.k-t2{left:17%;top:380px}
+.k-t3{right:15%;top:700px}
 .k-peace{left:3%;top:24px}
 .k-rejoice{right:5%;top:420px}
-.stk.a svg{width:var(--w);height:var(--w)}
 @media (max-width:1239px){.title .stk{--k:.78}.k-glory{left:-19%}.k-joy{right:-23%}}
 /* wide screens: stickers run off the edges of the page */
 @media (min-width:1240px){
-  .k-merry{left:calc(50% - 50vw - 46px);top:-30%}
-  .k-glory{left:calc(50% - 50vw + 54px);top:42%}
-  .k-star{right:calc(50% - 50vw + 150px);top:-48%}
+  .k-merry{left:calc(50% - 50vw - 46px);top:auto;bottom:-34%}
+  .k-glory{left:calc(50% - 50vw + 60px);top:-46%}
+  .k-sp1{right:calc(50% - 50vw + 150px);top:-48%}
   .k-joy{right:calc(50% - 50vw - 42px);top:8%;bottom:auto}
   .k-born{right:calc(50% - 50vw + 64px);bottom:-72%}
   .k-peace{left:calc(50% - 50vw - 34px)}
@@ -113,7 +123,7 @@ h1 > span{display:block}
   .stk,.title .stk{--k:.6}.stk:not(.m){display:none}
   .k-merry{left:-7%;top:-132%}
   .k-joy{right:-6%;bottom:auto;top:-150%}
-  .k-born{right:-3%;bottom:-112%}
+  .k-born{left:-9%;right:auto;bottom:-238%}
 }
 @media (prefers-reduced-motion:reduce){.stk{animation:none}}
 /* stage */
@@ -187,6 +197,8 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   .how{padding:28px 24px 26px}
   .next{width:104px;height:104px}
   .sec-head{margin-bottom:20px}
+  .lede{font-size:20px;max-width:320px}
+  .sec-head .help{font-size:19px}
   .bar{margin-bottom:24px}
   .steps{grid-template-columns:1fr;gap:14px}
   .ask{flex-direction:column;align-items:flex-start;gap:14px}
@@ -199,7 +211,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 <body>
 <main class="wrap">
   <section class="sec hero" id="s1">
-    <header class="head"><div class="title" id="title"><h1><span>Christmas</span><span>Giving Tree</span></h1></div></header>
+    <header class="head"><div class="title" id="title"><h1><span class="the">The</span><span>Christmas</span><span>Giving Tree</span></h1></div><p class="lede">Real needs from our community this Christmas. Pick a tag and help fill one.</p></header>
     <button type="button" class="next" data-next="s2" aria-label="How it works"></button>
   </section>
   <section class="sec" id="s2">
@@ -220,7 +232,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
     <button type="button" class="next" data-next="s3" aria-label="See the tree"></button>
   </section>
   <section class="sec tree-sec" id="s3">
-    <div class="sec-head"><h2>Pick a tag.</h2></div>
+    <div class="sec-head"><h2>Pick a tag.</h2><p class="help">Tap any tag to see what&rsquo;s needed and how to give.</p></div>
     <div class="bar" id="bar"></div>
     <section class="stage" id="stage"></section>
   </section>
@@ -371,11 +383,15 @@ function treeSVG(L){
     d+=` L${cx-a[j]} ${yb(j-1)} Q${cx-b[j-1]+P.ledge*.5} ${yb(j-1)+16} ${cx-b[j-1]} ${yb(j-1)}`;
   }
   d+=' Z';
-  // boughs: soft curved highlights under each tier
+  // garlands: looped strands across each tier
   let boughs='';
   for(let j=0;j<tiers;j++){
-    const w=bw(j)*.78, y=yb(j)-14;
-    boughs+=`<path d="M${cx-w} ${y-26}Q${cx} ${y+12} ${cx+w} ${y-26}" fill="none" stroke="#2E8E65" stroke-width="3" stroke-linecap="round" opacity=".55"/>`;
+    const top=j===0?y0:yb(j-1), bot=yb(j), yy=top+(bot-top)*.64, t=(yy-top)/(bot-top);
+    const aa=j===0?0:a[j], hw=(aa+(bw(j)-aa)*t)*.84;
+    const n=Math.max(3,Math.round(hw*2/(P.T*.6))), step=hw*2/n, dep=P.T*.15;
+    let p=`M${cx-hw} ${yy}`;
+    for(let i=0;i<n;i++){ const x0=cx-hw+i*step; p+=` Q${x0+step/2} ${yy+dep*2} ${x0+step} ${yy}`; }
+    boughs+=`<path d="${p}" fill="none" stroke="#C9CCF6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>`;
   }
   const g=P.T<130?.86:P.T>150?1.45:1.2, ground=last+66*g;
   const gift=(x,w,h,fill,rib)=>{ const y=ground-h, bx=x+w/2;
@@ -389,9 +405,13 @@ function treeSVG(L){
     <rect x="${cx-18*g}" y="${last-10}" width="${36*g}" height="${44*g}" rx="3" fill="#0B3A2A" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>
     <path d="${d}" fill="#17694B" stroke="#FFF4E2" stroke-width="9" stroke-linejoin="round"/>
     ${boughs}
+    <defs>
+      <pattern id="gDots" width="${14*g}" height="${14*g}" patternUnits="userSpaceOnUse"><rect width="${14*g}" height="${14*g}" fill="#17694B"/><circle cx="${4*g}" cy="${4*g}" r="${2.2*g}" fill="#C9CCF6"/><circle cx="${11*g}" cy="${11*g}" r="${2.2*g}" fill="#C9CCF6"/></pattern>
+      <pattern id="gStripe" width="${12*g}" height="${12*g}" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="${12*g}" height="${12*g}" fill="#FFF4E2"/><rect width="${5*g}" height="${12*g}" fill="#E0361A"/></pattern>
+    </defs>
     ${gift(cx-112*g,98*g,60*g,'#C9CCF6','#C22A0F')}
-    ${gift(cx-16*g,84*g,46*g,'#FFF4E2','#17694B')}
-    ${gift(cx+58*g,52*g,30*g,'#17694B','#C9CCF6')}
+    ${gift(cx-16*g,84*g,46*g,'url(#gStripe)','#17694B')}
+    ${gift(cx+58*g,52*g,30*g,'url(#gDots)','#E8B03E')}
     <g transform="translate(${cx-50*(P.T<130?.82:P.T>150?1.2:1)} ${y0-(P.T<130?72:P.T>150?100:84)}) scale(${P.T<130?.82:P.T>150?1.2:1})"><g id="star"></g></g>`;
 }
 
@@ -438,7 +458,7 @@ function renderTree(){
   stage.style.setProperty('--tw',L.P.T+'px'); stage.style.setProperty('--th',L.P.H+'px');
   stage.style.setProperty('--fs',L.P.fs+'px'); stage.style.setProperty('--mf',L.P.mf+'px');
   stage.innerHTML=`<svg class="tree" viewBox="0 0 ${W} ${L.H}" width="${W}" height="${L.H}" aria-hidden="true">${treeSVG(L)}</svg>`;
-  asterisk(stage.querySelector('#star'),{});
+  stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>`;
   if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
   const theme=L.P;
   for(const p of L.placed){
@@ -538,26 +558,40 @@ new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how
 /* ───────── Boot ───────── */
 /* ───────── Sticker decorations ───────── */
 const STICKERS=[
-  {at:'title',cls:'k-glory',kind:'c',text:'Glory to God in the highest',w:136,r:-14},
-  {at:'title',cls:'k-merry',kind:'tk',text:'Merry Christmas!',w:200,h:110,fill:'cream',r:-9,m:1},
-  {at:'title',cls:'k-star',kind:'a',w:74,r:14},
-  {at:'title',cls:'k-born',kind:'tk',text:'He is born.',w:180,h:98,fill:'lav',r:6,m:1},
-  {at:'title',cls:'k-joy',kind:'b',text:'Joy!',w:160,r:11,m:1},
-  {at:'how',cls:'k-god',kind:'tk',text:'God with us.',w:176,h:96,fill:'lav',r:6,wide:1},
-  {at:'how',cls:'k-adore',kind:'c',text:'Come, let us adore Him',w:116,r:-10,wide:1},
-  {at:'s3',cls:'k-peace',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'cream',r:-8,wide:1},
-  {at:'s3',cls:'k-rejoice',kind:'b',text:'Rejoice!',fs:25,w:158,r:9,wide:1},
+  {at:'title',cls:'k-glory',kind:'c',text:'Glory to God in the highest',w:136,r:-14,fill:'green'},
+  {at:'title',cls:'k-merry',kind:'tk',text:'Merry Christmas!',w:200,h:110,fill:'green',r:-8,m:1},
+  {at:'title',cls:'k-sp1',kind:'s8',w:68,r:8,fill:'lav'},
+  {at:'title',cls:'k-sp2',kind:'s4',w:54,r:0,fill:'gold'},
+  {at:'title',cls:'k-born',kind:'tk',text:'He is born.',w:180,h:98,fill:'cream',r:6,m:1},
+  {at:'title',cls:'k-joy',kind:'b',text:'Joy!',w:160,r:11,fill:'lav',m:1},
+  {at:'how',cls:'k-h1',kind:'s8',w:96,r:10,fill:'green',m:1},
+  {at:'how',cls:'k-h2',kind:'s4',w:70,r:0,fill:'gold',m:1},
+  {at:'how',cls:'k-h3',kind:'s8',w:42,r:-6,fill:'lav',wide:1},
+  {at:'s3',cls:'k-peace',kind:'tk',text:'Peace on earth.',w:186,h:100,fill:'lav',r:-8,wide:1},
+  {at:'s3',cls:'k-t1',kind:'s4',w:48,r:0,fill:'cream',wide:1},
+  {at:'s3',cls:'k-t2',kind:'s8',w:46,r:-10,fill:'lav',wide:1},
+  {at:'s3',cls:'k-t3',kind:'s4',w:56,r:0,fill:'gold',wide:1},
+  {at:'s3',cls:'k-rejoice',kind:'b',text:'Rejoice!',fs:25,w:158,r:9,fill:'green',wide:1},
 ];
-function burstSVG(w,text,fs){
+const FILL={cream:'#FFF4E2',lav:'#C9CCF6',green:'#17694B',gold:'#E8B03E'};
+const INK=f=>f==='green'?'#FFF4E2':'#C22A0F';
+function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;p.push((c+Math.cos(a)*rad).toFixed(1)+','+(c+Math.sin(a)*rad).toFixed(1))}return p.join(' ')}
+function shapeSVG(kind,fill){
+  const body=kind==='s8'
+    ? `<polygon points="${starPts(8,46,19)}"/>`
+    : `<path d="M50 4C54 38 62 46 96 50C62 54 54 62 50 96C46 62 38 54 4 50C38 46 46 38 50 4Z"/>`;
+  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g></svg>`;
+}
+function burstSVG(w,text,fs,fill='lav'){
   const n=14,R=68,r=52,pts=[];
   for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;pts.push((75+Math.cos(a)*rad).toFixed(1)+','+(75+Math.sin(a)*rad).toFixed(1))}
-  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="#C9CCF6" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/><text x="75" y="${75+(fs||46)*.34}" style="font-size:${fs||46}px">${text}</text></svg>`;
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/><text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
 }
-function badgeSVG(w,text){
+function badgeSVG(w,text,fill='cream'){
   const t=(text.toUpperCase()+' \u00b7 ');
-  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="#FFF4E2"/><circle cx="75" cy="75" r="62" fill="none" stroke="#C22A0F" stroke-width="4"/>
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6"/><circle cx="75" cy="75" r="60" fill="none" stroke="${INK(fill)}" stroke-width="3"/>
   <path id="p%ID%" d="M75 75m-46 0a46 46 0 1 1 92 0a46 46 0 1 1 -92 0" fill="none"/>
-  <text><textPath href="#p%ID%" startOffset="0" textLength="286" lengthAdjust="spacing">${t}</textPath></text></svg>`;
+  <text fill="${INK(fill)}"><textPath href="#p%ID%" startOffset="0" textLength="286" lengthAdjust="spacing">${t}</textPath></text></svg>`;
 }
 function buildStickers(){
   STICKERS.forEach((d,i)=>{
@@ -567,11 +601,11 @@ function buildStickers(){
     el.style.cssText='--r:'+d.r+'deg;--w:'+d.w+'px;--fd:'+(6+(i%4))+'s;--fl:-'+(i*1.3)+'s';
     if(d.kind==='tk'){
       el.style.width=d.w+'px'; el.style.height=d.h+'px';
-      el.style.backgroundImage=ticketURL(d.w,d.h,{fill:d.fill==='lav'?'#C9CCF6':'#FFF4E2',stroke:'#C22A0F',r:13,d:8,sw:2.5});
+      el.style.backgroundImage=ticketURL(d.w,d.h,{fill:FILL[d.fill],stroke:INK(d.fill),r:13,d:8,sw:2.5}); el.style.color=INK(d.fill);
       el.textContent=d.text;
-    } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs);
-    else if(d.kind==='a'){ el.innerHTML='<svg viewBox="0 0 100 100"></svg>'; asterisk(el.firstChild,{outer:'#FFF4E2',inner:'#C9CCF6',w:26,iw:12}); }
-    else el.innerHTML=badgeSVG(d.w,d.text).replaceAll('%ID%',i);
+    } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs,d.fill);
+    else if(d.kind==='s8'||d.kind==='s4') el.innerHTML=shapeSVG(d.kind,d.fill);
+    else el.innerHTML=badgeSVG(d.w,d.text,d.fill).replaceAll('%ID%',i);
     host.append(el);
   });
 }
