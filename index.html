@@ -168,6 +168,34 @@ h1 > span{display:block}
 @keyframes sway{from{transform:rotate(calc(var(--rot) - 1.8deg))}to{transform:rotate(calc(var(--rot) + 1.8deg))}}
 @media (prefers-reduced-motion:reduce){.tag{animation:none}}
 
+/* motion: first-view reveals. translate/scale are separate from transform, so they stack with the
+   stickers' float, the tags' sway and the hover lifts instead of replacing them. */
+.rv{opacity:0;translate:0 22px;
+  transition:opacity .7s cubic-bezier(.2,.7,.2,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s),scale .7s cubic-bezier(.3,1.45,.5,1) var(--d,0s)}
+.rv.pop{translate:none;scale:.55}
+.rv.in{opacity:1;translate:0 0;scale:1}
+.tag.rv{transition:opacity .45s ease var(--d,0s),scale .6s cubic-bezier(.3,1.5,.5,1) var(--d,0s),filter .25s}
+.next.rv{transition:opacity .6s ease var(--d,0s),scale .8s cubic-bezier(.3,1.5,.5,1) var(--d,0s),transform .25s cubic-bezier(.3,1.6,.5,1)}
+.chip.rv{transition:opacity .5s ease var(--d,0s),translate .7s cubic-bezier(.16,1,.3,1) var(--d,0s),background .15s,color .15s}
+.stage svg.tree.rv{translate:0 40px;transition:opacity 1s ease,translate 1.2s cubic-bezier(.16,1,.3,1)}
+/* presses: a quick give under the finger */
+.btn,.pill-btn,.chip,.memo button,.cal .d,.seg span{transition:transform .18s cubic-bezier(.3,1.6,.5,1),background .15s,color .15s,border-color .15s}
+.btn:active,.pill-btn:active,.chip:active,.memo button:active{transform:scale(.97)}
+.cal .d:not([disabled]):active{transform:scale(.9)}
+.tag:active{scale:.97}
+.memo.done .ml,.memo.done button{animation:tick .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tick{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+/* the card pops in and eases out */
+dialog[open] .card{animation:cardIn .46s cubic-bezier(.2,1.3,.4,1) both}
+dialog[open]::backdrop{animation:dimIn .3s ease both}
+dialog.out .card{animation:cardOut .17s ease-in both}
+dialog.out::backdrop{animation:dimOut .17s ease-in both}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.92)}}
+@keyframes cardOut{to{opacity:0;transform:translateY(8px) scale(.96)}}
+@keyframes dimIn{from{opacity:0}}
+@keyframes dimOut{to{opacity:0}}
+@media (prefers-reduced-motion:reduce){dialog[open] .card,dialog.out .card,dialog[open]::backdrop,dialog.out::backdrop{animation:none}}
+
 /* modal */
 dialog.fixed{position:fixed;top:50% !important;transform:translate(-50%,-50%)}
 dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%);width:min(100vw,480px);max-width:none;max-height:var(--mh,calc(100vh - 20px));overflow-y:auto;overscroll-behavior:contain;padding:20px;
@@ -521,7 +549,8 @@ function viaLauncher(a){
 /* ───────── Render ───────── */
 const stage=document.getElementById('stage'), bar=document.getElementById('bar');
 const dlg=document.getElementById('dlg'), card=document.getElementById('card');
-let NEEDS=[], FILTER=null, lastW=0, failed=false;
+let NEEDS=[], FILTER=null, lastW=0, failed=false, TREE_IN=false;
+const SEEN=new Set();   // tags that have already popped in
 
 function renderBar(){
   const c={open:0,claimed:0,filled:0}; NEEDS.forEach(n=>c[n.status]++);
@@ -531,6 +560,7 @@ function renderBar(){
     const b=document.createElement('button');
     b.className='chip'; b.setAttribute('aria-pressed',FILTER===s);
     b.innerHTML=`<i class="${s}"></i><b>${c[s]}</b>${LABEL[s]}`;
+    if(!TREE_IN) rv(b,.15+chips.children.length*.07);
     b.onclick=()=>{FILTER=FILTER===s?null:s; FILTER?stage.dataset.f=FILTER:delete stage.dataset.f; renderBar()};
     chips.append(b);
   }
@@ -551,6 +581,7 @@ function renderTree(){
   stage.innerHTML=`<svg class="tree" viewBox="0 0 ${W} ${L.H}" width="${W}" height="${L.H}" aria-hidden="true">${treeSVG(L)}</svg>`;
   const top=`<polygon points="${starPts(8,46,20)}"/>`, ts=W<560?.9:L.P.T>150?1.2:1;
   stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${inked('top',top,100,100*ts)}`;
+  if(!TREE_IN) rv(stage.querySelector('svg.tree'));
   if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
   const theme=L.P;
   for(const p of L.placed){
@@ -564,9 +595,11 @@ function renderTree(){
     el.innerHTML=`<span class="in"><span class="meta"><span>${num}</span><span>${n.status==='open'?'':n.status==='filled'?'✓ Filled':'Claimed'}</span></span><span class="txt"><span></span></span></span>${n.status==='open'&&n.amount?`<span class="amt">$${n.amount.replace(/[^0-9.]/g,'')}</span>`:''}`;
     el.querySelector('.txt span').textContent=n.need;
     el.onclick=()=>openCard(n,el);
+    if(!SEEN.has(String(n.id))) rv(el,.04+(p.x/W)*.22,1);
     stage.append(el);
   }
-  postHeight();
+  if(NEEDS.length&&stage.querySelector('svg.tree.in')) TREE_IN=true;
+  postHeight(); requestAnimationFrame(()=>reveal());
 }
 
 /* ───────── Card ───────── */
@@ -608,7 +641,7 @@ function openCard(n,from){
     act.innerHTML=n.status==='filled'
       ? '<div class="done-note"><b>\u2713 Filled</b><span>This need has been met. Thank you!</span></div><button type="button" class="btn ghost">Pick another tag</button>'
       : '<div class="done-note claimed"><b>Already claimed</b><span>Someone is taking care of this one.</span></div><button type="button" class="btn ghost">Pick another tag</button>';
-    act.querySelector('.btn').onclick=()=>dlg.close();
+    act.querySelector('.btn').onclick=closeCard;
   }
   showCard(fromRect,y0);
 }
@@ -616,9 +649,9 @@ const X_BTN='<button class="x" aria-label="Close"><svg viewBox="0 0 16 16" fill=
 let LAST=null;
 function showCard(fromRect,y0){
   LAST={r:fromRect,y0};
-  card.querySelector('.x').onclick=()=>dlg.close();
+  card.querySelector('.x').onclick=closeCard;
   dlg.style.top=(y0+Math.max(14,fromRect.top-60))+'px';
-  dlg.showModal();
+  dlg.classList.remove('out'); dlg.showModal();
   if(window.scrollY!==y0) window.scrollTo(0,y0);
   placeDialog(fromRect,y0);
   if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:true},'*');
@@ -677,7 +710,7 @@ function openNeedForm(from){
     card.innerHTML=`${X_BTN}<div class="top"><span>Submit a need</span></div><h2>Thank you.</h2>
       <p>We&rsquo;ll look it over and hang it on the tree soon. Submissions are open until December 6.</p>
       <div class="actions"><button type="button" class="btn primary">Done</button></div>`;
-    card.querySelector('.x').onclick=card.querySelector('.actions .btn').onclick=()=>dlg.close();
+    card.querySelector('.x').onclick=card.querySelector('.actions .btn').onclick=closeCard;
     reflow();
   });
   showCard(fromRect,y0);
@@ -747,7 +780,7 @@ function pledgeForm(n){
     card.querySelector('h2 .amt')?.remove();
     act.innerHTML=`<div class="done-note"><b>Tag ${num} is yours. Thank you!</b><span>${esc(seeYou(picked))}</span>${CONFIG.dropoffNote?`<span>${esc(CONFIG.dropoffNote)}</span>`:''}</div>
       <button type="button" class="btn primary">Done</button>`;
-    act.querySelector('.btn').onclick=()=>dlg.close();
+    act.querySelector('.btn').onclick=closeCard;
     reflow();
   });
   reflow();
@@ -783,7 +816,15 @@ function placeDialog(r,y0){
   top=Math.max(14,Math.min(top,vh-h-14));
   dlg.style.top=(y0+top)+'px';
 }
-dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+/* Cards pop in (CSS) and ease out before closing. */
+function closeCard(){
+  if(!dlg.open||dlg.classList.contains('out')) return;
+  if(REDUCED){ dlg.close(); return; }
+  dlg.classList.add('out');
+  setTimeout(()=>{ dlg.classList.remove('out'); dlg.close(); },170);
+}
+dlg.addEventListener('cancel',e=>{ e.preventDefault(); closeCard(); });
+dlg.addEventListener('click',e=>{if(e.target===dlg)closeCard()});
 /* While a card is open, swipes stay inside it. In the embed a swipe on the backdrop (or past the end of
    the card) would otherwise scroll the church site behind it, which phones allow even with scroll locked. */
 let TOUCH_Y=0;
@@ -891,7 +932,7 @@ function setSec(h){
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
 else { addEventListener('message',e=>{ const d=e.data;
   if(d&&d.type==='giving-tree:viewport'&&d.height){ const first=!SEC; if(d.launch) CAN_LAUNCH=true; if(setSec(d.height)||first) postHeight(first); }
-  if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); } }); }
+  if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); reveal(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
   return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="61" fill="#FFF4E2"/><circle cx="64" cy="64" r="55" fill="none" stroke="#C22A0F" stroke-width="2.5"/>`+
@@ -899,11 +940,52 @@ function nextBadge(label,id){
     `<circle cx="64" cy="64" r="24" fill="#17694B"/><g class="dn"><path d="M59.5 51H68.5V64H76L64 78L52 64H59.5Z" fill="#FFF4E2" stroke="#FFF4E2" stroke-width="2" stroke-linejoin="round"/></g></svg>`;
 }
 document.querySelectorAll('.next').forEach((b,i)=>{ b.innerHTML=nextBadge(b.getAttribute('aria-label'),'nb'+i); });
+/* Arrows glide to the next section with a slow ease-in-out instead of the browser's quick smooth scroll.
+   In the embed the church site scrolls (its embed script runs the same ease). */
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function glide(to){
+  if(REDUCED){ scrollTo(0,to); return; }
+  const from=scrollY, d=to-from, dur=Math.min(1600,Math.max(1100,Math.abs(d)*1.1)); let t0=null, stop=false;
+  const cancel=()=>{stop=true}; addEventListener('wheel',cancel,{once:true,passive:true}); addEventListener('touchstart',cancel,{once:true,passive:true});
+  const step=t=>{ if(stop) return; t0??=t; const p=Math.min(1,(t-t0)/dur), e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+    scrollTo({top:from+d*e,behavior:'instant'}); if(p<1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
 document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
   const t=document.getElementById(b.dataset.next); if(!t) return;
-  t.scrollIntoView({behavior:'smooth',block:'start'});
-  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:t.getBoundingClientRect().top+scrollY},'*');
+  const y=t.getBoundingClientRect().top+scrollY;
+  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y},'*'); else glide(y);
 }));
+
+/* ───────── Reveal on scroll ─────────
+   Elements marked .rv fade up (or .pop scale in) the first time they enter the visible part of the page.
+   Inside the embed the frame can't see the site's scroll, so the visible band comes from the embed script. */
+function rv(el,d=0,pop){ if(!el||REDUCED) return; el.classList.add('rv'); if(pop) el.classList.add('pop'); if(d) el.style.setProperty('--d',d.toFixed(2)+'s'); }
+function reveal(all){
+  const band=parent===window?[scrollY,innerHeight]:VIEW?[VIEW.top,VIEW.height]:null;
+  if(!band&&!all) return;
+  document.querySelectorAll('.rv:not(.in)').forEach(el=>{
+    const r=el.getBoundingClientRect(); if(!r.width&&!r.height) return;
+    const y=r.top+scrollY;
+    if(all||(y<band[0]+band[1]*.94&&y+r.height>band[0])){
+      el.classList.add('in'); if(el.dataset.id) SEEN.add(el.dataset.id);
+      const d=parseFloat(el.style.getPropertyValue('--d'))||0;
+      if(d) setTimeout(()=>el.style.removeProperty('--d'),(d+.9)*1000);   // later hovers shouldn't wait
+    }
+  });
+}
+document.querySelectorAll('h1 > span').forEach((el,i)=>rv(el,.05+i*.1));
+rv(document.querySelector('.lede'),.32);
+document.querySelectorAll('.next').forEach(b=>rv(b,.2,1));
+document.querySelectorAll('.stk').forEach((el,i)=>rv(el,.3+(i%6)*.09,1));
+rv(how);
+document.querySelectorAll('.steps li').forEach((el,i)=>rv(el,.18+i*.09));
+rv(document.querySelector('.ask'),.45);
+rv(document.querySelector('.sec-head h2')); rv(document.querySelector('.sec-head .help'),.1);
+if(parent===window) addEventListener('scroll',()=>reveal(),{passive:true});
+addEventListener('resize',()=>reveal());
+setTimeout(()=>{ if(parent!==window&&!VIEW) reveal(true); },1800);   // an older embed script never sends the view
+requestAnimationFrame(()=>reveal());
 // The embed script answers every height with a viewport message, so only send real changes.
 let SENT_H=0;
 const docH=()=>Math.ceil(document.querySelector('main').getBoundingClientRect().bottom+window.scrollY);
