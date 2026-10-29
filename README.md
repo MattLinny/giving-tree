@@ -18,7 +18,7 @@ addEventListener('scroll',function(){if(!t){t=1;requestAnimationFrame(function()
 addEventListener('message',function(e){var d=e.data;if(!d||e.source!==f.contentWindow)return;
  if(d.type==='giving-tree:height'){f.style.height=d.height+'px';send();}
  if(d.type==='giving-tree:scroll'){window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY+d.y-16,behavior:'smooth'});}
- if(d.type==='giving-tree:modal'){document.documentElement.style.overflow=d.open?'hidden':'';if(d.open)view();}
+ if(d.type==='giving-tree:modal'){var r=f.getBoundingClientRect();if(d.open&&r.bottom<innerHeight)window.scrollBy({top:r.bottom-innerHeight,behavior:'instant'});document.documentElement.style.overflow=document.body.style.overflow=d.open?'hidden':'';if(d.open)view();}
  if(d.type==='giving-tree:launch'&&/^https:\/\/launcher\.nucleus\.church\//.test(d.href)){var a=document.createElement('a');a.href=d.href;a.style.display='none';document.body.appendChild(a);a.click();a.remove();}});
 addEventListener('resize',send);f.addEventListener('load',send);})();
 </script>

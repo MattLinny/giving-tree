@@ -119,11 +119,22 @@ h1 .the{position:absolute;left:-.04em;top:-.5em;font:400 .5em/1 'Allenoire',var(
 }
 @media (min-width:1600px){.stk{--k:1.18}}
 @media (max-width:879px){.stk.wide{display:none}}
+.stk.mo{display:none}
+/* phones and small tablets: shapes only around the title, and the arrow sits at the foot of the screen */
+@media (max-width:879px){
+  .title .stk:not(.mo){display:none} .stk.mo{display:block;--k:1}
+  .hero{padding-top:84px;justify-content:flex-start}
+  .hero .head{margin:auto 0;padding-bottom:8px}
+  .hero .next{margin:32px auto 14px}
+  .p-star{right:-30px;top:-92px}
+  .p-spark{left:0;top:-58px}
+  .p-burst{left:-58px;bottom:4px}     /* level with the arrow, half off the left edge */
+  .p-glint{right:14px;bottom:100px}
+  .p-dot{right:74px;bottom:26px}
+}
 @media (max-width:620px){
-  .stk,.title .stk{--k:.6}.stk:not(.m){display:none}
-  .k-merry{left:-7%;top:-132%}
-  .k-joy{right:-6%;bottom:auto;top:-150%}
-  .k-born{left:-9%;right:auto;bottom:-238%}
+  .stk{--k:.6}.stk:not(.m){display:none}
+  .stk.mo{display:block;--k:1}
 }
 @media (prefers-reduced-motion:reduce){.stk{animation:none}}
 /* stage */
@@ -234,6 +245,13 @@ button.btn{width:100%;font-family:var(--wide)}
 .x svg{width:16px;height:16px}
 
 @media (max-width:620px){
+  /* vh inside the embed means the whole frame's height, so phones get fixed spacing instead */
+  h1{font-size:clamp(44px,14.4vw,90px)}
+  .lede{margin-top:28px}
+  .next{margin-top:48px}
+  .tree-sec{padding-top:64px;padding-bottom:104px}
+  .sm .tag .txt{padding:0 16px}
+  .sm .tag.pl .amt{right:auto;left:-9px;transform:rotate(-6deg)}
   .wrap{padding:16px 10px 32px}
   .chips,.bar{gap:6px}
   .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
@@ -395,7 +413,9 @@ function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h
 /* ───────── Tree layout ───────── */
 function layout(items,W){
   const m=W<560;
-  const P=m?{T:110,H:70,g:6,hang:20,pitch:96,ledge:22,pad:18,inset:8,slope:.55,bot:18,fs:10.5,mf:8.5}
+  // phones: three tags span the widest rows and run ~12px off each edge of the screen
+  const mT=Math.min(150,Math.floor((W+28)/3)), mH=Math.round(mT*.62);
+  const P=m?{T:mT,H:mH,g:8,hang:22,pitch:mH+26,ledge:24,pad:20,inset:-Math.round(mT*.2),slope:.55,bot:18,fs:+(mT*.092).toFixed(1),mf:9}
          :W<1000?{T:138,H:86,g:14,hang:26,pitch:120,ledge:36,pad:26,inset:12,slope:.52,bot:22,fs:12.5,mf:9.5}
          :{T:168,H:104,g:18,hang:30,pitch:144,ledge:44,pad:32,inset:14,slope:.52,bot:26,fs:15,mf:10.5};
   const bleed=m?46:0; // on phones the tree runs past the page edges
@@ -408,7 +428,7 @@ function layout(items,W){
     ensure(tier); lastRows=0;
     for(let r=0;r<2&&idx<items.length;r++){
       const off=P.hang+r*P.pitch, t=off/tierH;
-      const hw=Math.min(a[tier]+(b[tier]-a[tier])*t-P.inset, W/2-4); // tags never leave the page
+      const hw=Math.min(a[tier]+(b[tier]-a[tier])*t-P.inset, W/2+(m?22:-4)); // only phones let tags off the page
       const cap=Math.max(Math.floor((2*hw+P.g)/(P.T+P.g)),tier>2?1:0);
       const n=Math.min(cap,items.length-idx);
       if(n) lastRows=r+1;
@@ -452,7 +472,7 @@ function treeSVG(L){
     for(let i=0;i<n;i++){ const x0=cx-hw+i*step; p+=` Q${x0+step/2} ${yy+dep*2} ${x0+step} ${yy}`; }
     boughs+=`<path d="${p}" fill="none" stroke="#C9CCF6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>`;
   }
-  const g=P.T<130?.86:P.T>150?1.45:1.2, ground=last+66*g;
+  const sm=L.W<560, g=sm?1:P.T>150?1.45:1.2, ground=last+66*g;
   const gift=(x,w,h,fill,rib)=>{ const y=ground-h, bx=x+w/2;
     return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round"/>`+
       `<rect x="${bx-6*g}" y="${y}" width="${12*g}" height="${h}" fill="${rib}"/>`+
@@ -471,7 +491,7 @@ function treeSVG(L){
     ${gift(cx-112*g,98*g,60*g,'#C9CCF6','#C22A0F')}
     ${gift(cx-16*g,84*g,46*g,'url(#gStripe)','#17694B')}
     ${gift(cx+58*g,52*g,30*g,'url(#gDots)','#E8B03E')}
-    <g transform="translate(${cx-50*(P.T<130?.82:P.T>150?1.2:1)} ${y0-(P.T<130?72:P.T>150?100:84)}) scale(${P.T<130?.82:P.T>150?1.2:1})"><g id="star"></g></g>`;
+    <g transform="translate(${cx-50*(sm?.9:P.T>150?1.2:1)} ${y0-(sm?78:P.T>150?100:84)}) scale(${sm?.9:P.T>150?1.2:1})"><g id="star"></g></g>`;
 }
 
 /* ───────── Nucleus pop-ups ─────────
@@ -526,7 +546,7 @@ function renderTree(){
   for(const p of L.placed){
     const n=p.item, t=THEME[n.status];
     const el=document.createElement('button');
-    el.className=`tag ${n.status}`; el.dataset.id=n.id;
+    el.className=`tag ${n.status}${p.x+L.P.T/2>L.cx+1?' pl':''}`; el.dataset.id=n.id;
     el.setAttribute('aria-label',`Tag ${n.id}: ${n.need}. ${LABEL[n.status]}.`);
     el.style.cssText=`left:${p.x}px;top:${p.y}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;`+
       `background-image:${ticketURL(L.P.T,L.P.H,{...t,r:L.P.T<110?8:L.P.T>150?12:10,d:L.P.T<110?5:L.P.T>150?7:6})}`;
@@ -739,7 +759,9 @@ function paintCard(){
 function placeDialog(r,y0){
   if(parent===window){ dlg.classList.add('fixed'); return; }   // standalone: a normal fixed modal
   if(VIEW){                                                     // embedded: centre in what the visitor can see
-    const vt=Math.max(0,VIEW.top), vb=VIEW.top+VIEW.height;
+    // near the bottom the site's footer may be in view; the embed script scrolls the page so this
+    // frame fills the screen, so centre in that final position rather than chasing it
+    const vb=Math.min(VIEW.top+VIEW.height,docH()), vt=Math.max(0,vb-VIEW.height);
     dlg.style.setProperty('--mh',Math.max(320,vb-vt-20)+'px');
     const h=dlg.offsetHeight;
     dlg.style.top=(vt+Math.max(10,(vb-vt-h)/2))+'px';
@@ -751,6 +773,18 @@ function placeDialog(r,y0){
   dlg.style.top=(y0+top)+'px';
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+/* While a card is open, swipes stay inside it. In the embed a swipe on the backdrop (or past the end of
+   the card) would otherwise scroll the church site behind it, which phones allow even with scroll locked. */
+let TOUCH_Y=0;
+addEventListener('touchstart',e=>{ TOUCH_Y=e.touches[0].clientY; },{passive:true});
+addEventListener('touchmove',e=>{
+  if(!dlg.open) return;
+  const t=e.touches[0], dy=t.clientY-TOUCH_Y, r=dlg.getBoundingClientRect(); TOUCH_Y=t.clientY;
+  const inCard=t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom;
+  const atTop=dlg.scrollTop<=0, atEnd=dlg.scrollTop+dlg.clientHeight>=dlg.scrollHeight-1;
+  if(inCard&&!(dy>0&&atTop)&&!(dy<0&&atEnd)) return;
+  e.preventDefault();
+},{passive:false});
 dlg.addEventListener('close',()=>{ if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:false},'*'); });
 new ResizeObserver(paintCard).observe(card);
 const how=document.getElementById('how');
@@ -760,11 +794,17 @@ new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how
 /* ───────── Sticker decorations ───────── */
 const STICKERS=[
   {at:'title',cls:'k-glory',kind:'c',text:'Glory to God in the highest',w:136,r:-14,fill:'green'},
-  {at:'title',cls:'k-merry',kind:'tk',text:'Merry Christmas!',w:200,h:110,fill:'green',r:-8,m:1},
+  {at:'title',cls:'k-merry',kind:'tk',text:'Merry Christmas!',w:200,h:110,fill:'green',r:-8},
   {at:'title',cls:'k-sp1',kind:'s8',w:68,r:8,fill:'lav'},
   {at:'title',cls:'k-sp2',kind:'s4',w:54,r:0,fill:'gold'},
-  {at:'title',cls:'k-born',kind:'tk',text:'He is born.',w:180,h:98,fill:'cream',r:6,m:1},
-  {at:'title',cls:'k-joy',kind:'b',text:'Joy!',w:160,r:11,fill:'lav',m:1},
+  {at:'title',cls:'k-born',kind:'tk',text:'He is born.',w:180,h:98,fill:'cream',r:6},
+  {at:'title',cls:'k-joy',kind:'b',text:'Joy!',w:160,r:11,fill:'lav'},
+  // phones: shapes only, framing the title above and the arrow below
+  {at:'title',cls:'p-star',kind:'s8',w:82,r:12,fill:'lav',m:1,mo:1},
+  {at:'title',cls:'p-spark',kind:'s4',w:38,r:0,fill:'gold',m:1,mo:1},
+  {at:'s1',cls:'p-burst',kind:'b',text:'',w:124,r:-8,fill:'green',m:1,mo:1},
+  {at:'s1',cls:'p-glint',kind:'s4',w:50,r:0,fill:'cream',m:1,mo:1},
+  {at:'s1',cls:'p-dot',kind:'s8',w:30,r:-10,fill:'gold',m:1,mo:1},
   {at:'how',cls:'k-h1',kind:'s8',w:96,r:10,fill:'green',m:1},
   {at:'how',cls:'k-h2',kind:'s4',w:70,r:0,fill:'gold',m:1},
   {at:'how',cls:'k-h3',kind:'s8',w:42,r:-6,fill:'lav',wide:1},
@@ -798,7 +838,7 @@ function buildStickers(){
   STICKERS.forEach((d,i)=>{
     const host=document.getElementById(d.at); if(!host) return;
     const el=document.createElement('div');
-    el.className='stk '+d.kind+' '+d.cls+(d.wide?' wide':'')+(d.m?' m':''); el.setAttribute('aria-hidden','true');
+    el.className='stk '+d.kind+' '+d.cls+(d.wide?' wide':'')+(d.m?' m':'')+(d.mo?' mo':''); el.setAttribute('aria-hidden','true');
     el.style.cssText='--r:'+d.r+'deg;--w:'+d.w+'px;--fd:'+(6+(i%4))+'s;--fl:-'+(i*1.3)+'s';
     if(d.kind==='tk'){
       el.style.width=d.w+'px'; el.style.height=d.h+'px';
@@ -811,9 +851,22 @@ function buildStickers(){
   });
 }
 buildStickers();
-function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
+/* Sections are one screen tall. Phone toolbars grow and shrink while scrolling, which changes the
+   reported height by ~100px; following that makes every section jump under the background, so on
+   touch screens only a width change (rotation) or a big height change resizes them. */
+let SEC=null;
+const TOUCH=matchMedia('(pointer:coarse)').matches;
+function setSec(h){
+  const w=innerWidth;
+  if(SEC&&TOUCH&&SEC.w===w&&Math.abs(SEC.h-h)<160) return false;
+  if(SEC&&SEC.w===w&&SEC.h===h) return false;
+  SEC={w,h};
+  document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px');
+  return true;
+}
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
-else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ if(d.launch) CAN_LAUNCH=true; setSec(d.height); postHeight(); }
+else { addEventListener('message',e=>{ const d=e.data;
+  if(d&&d.type==='giving-tree:viewport'&&d.height){ const first=!SEC; if(d.launch) CAN_LAUNCH=true; if(setSec(d.height)||first) postHeight(first); }
   if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
@@ -827,9 +880,12 @@ document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
   t.scrollIntoView({behavior:'smooth',block:'start'});
   if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:t.getBoundingClientRect().top+scrollY},'*');
 }));
-function postHeight(){
+// The embed script answers every height with a viewport message, so only send real changes.
+let SENT_H=0;
+const docH=()=>Math.ceil(document.querySelector('main').getBoundingClientRect().bottom+window.scrollY);
+function postHeight(force){
   if(parent===window) return;
-  requestAnimationFrame(()=>parent.postMessage({type:'giving-tree:height',height:Math.ceil(document.querySelector('main').getBoundingClientRect().bottom+window.scrollY)},'*'));
+  requestAnimationFrame(()=>{ const h=docH(); if(h===SENT_H&&!force) return; SENT_H=h; parent.postMessage({type:'giving-tree:height',height:h},'*'); });
 }
 async function refresh(first){
   try{ NEEDS=await loadNeeds(); failed=false }
