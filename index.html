@@ -76,7 +76,7 @@ h1 .the{position:absolute;left:-.04em;top:-.5em;font:400 .5em/1 'Allenoire',var(
 .sec-head .help{margin-top:14px;font:400 22px/1.35 var(--serif);font-variation-settings:'opsz' 30;color:var(--cream)}
 .sec-head h2{font:400 clamp(46px,8.4vw,78px)/.9 'Allenoire',var(--display);color:var(--cream);text-shadow:3px 4px 0 var(--red-deep);font-variant-ligatures:common-ligatures}
 .bar{margin:0 0 30px}
-.pill-btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;background:var(--red-ink);color:var(--cream);text-decoration:none;white-space:nowrap;
+.pill-btn{border:0;cursor:pointer;font:inherit;display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 24px;border-radius:999px;background:var(--red-ink);color:var(--cream);text-decoration:none;white-space:nowrap;
   font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;transition:transform .15s}
 .pill-btn:hover{transform:translateY(-1px)}
 .pill-btn:focus-visible{outline:3px solid var(--red-ink);outline-offset:3px}
@@ -158,9 +158,10 @@ h1 .the{position:absolute;left:-.04em;top:-.5em;font:400 .5em/1 'Allenoire',var(
 
 /* modal */
 dialog.fixed{position:fixed;top:50% !important;transform:translate(-50%,-50%)}
-dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%);width:min(96vw,464px);max-width:none;max-height:var(--mh,calc(100vh - 20px));overflow-y:auto;overscroll-behavior:contain;padding:12px;
+dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%);width:min(100vw,480px);max-width:none;max-height:var(--mh,calc(100vh - 20px));overflow-y:auto;overscroll-behavior:contain;padding:20px;
   border:0;background:transparent;color:var(--ink)}
 dialog::backdrop{background:rgba(96,14,2,.6)}
+.card:focus{outline:none}
 .card{position:relative;padding:36px 34px 32px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep))}
 .card .top{display:flex;justify-content:space-between;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink);opacity:.6}
 .card .st.filled{color:var(--pine)}
@@ -215,6 +216,7 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
 .btn[disabled]{opacity:.65;cursor:progress}
 button.btn{width:100%;font-family:var(--wide)}
 .done-note{display:grid;gap:6px;padding:14px 16px;border-radius:16px;background:rgba(23,105,75,.1);border:2px solid var(--pine);color:var(--pine);font:400 16px/1.4 var(--serif)}
+.done-note.claimed{background:rgba(201,204,246,.45);border-color:#8E93D6;color:var(--red-ink)}
 .done-note b{font-family:var(--wide);font-weight:800;font-stretch:112%;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
 .memo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 12px 12px 16px;border-radius:16px;border:2px dashed var(--red-ink);background:rgba(194,42,15,.07);color:var(--red-ink)}
 .memo .mt{display:flex;flex-direction:column;gap:7px;min-width:0}
@@ -228,7 +230,7 @@ button.btn{width:100%;font-family:var(--wide)}
 .sm .tag .amt{font-size:10.5px;padding:4px 8px;right:-9px;top:-11px}
 .note{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:999px;border:2px dashed var(--red-ink);
   color:var(--red-ink);font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.x{position:absolute;top:-8px;right:-8px;width:42px;height:42px;border-radius:50%;border:3px solid var(--cream);background:var(--red-ink);color:var(--cream);cursor:pointer;display:grid;place-items:center}
+.x{position:absolute;top:-10px;right:-10px;z-index:2;width:42px;height:42px;border-radius:50%;border:3px solid var(--cream);background:var(--red-ink);color:var(--cream);cursor:pointer;display:grid;place-items:center}
 .x svg{width:16px;height:16px}
 
 @media (max-width:620px){
@@ -280,7 +282,7 @@ button.btn{width:100%;font-family:var(--wide)}
     <section class="stage" id="stage"></section>
   </section>
 </main>
-<dialog id="dlg"><div class="card" id="card"></div></dialog>
+<dialog id="dlg" aria-label="Tag details"><div class="card" id="card" tabindex="-1"></div></dialog>
 
 <script>
 /* ───────── Config ───────── */
@@ -573,7 +575,10 @@ function openCard(n,from){
     if(CONFIG.apiUrl){ act.insertAdjacentHTML('beforeend','<button type="button" class="btn ghost">I\u2019ll bring it</button>'); act.lastElementChild.onclick=()=>pledgeForm(n); }
     else if(hand){ act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_top" href="${hand.replace(/"/g,'&quot;')}">I\u2019ll bring it</a>`); viaLauncher(act.lastElementChild); }
   } else {
-    act.innerHTML=`<div class="note">${n.status==='filled'?'✓ Filled':'Claimed'} · Thank you</div>`;
+    act.innerHTML=n.status==='filled'
+      ? '<div class="done-note"><b>\u2713 Filled</b><span>This need has been met. Thank you!</span></div><button type="button" class="btn ghost">Pick another tag</button>'
+      : '<div class="done-note claimed"><b>Already claimed</b><span>Someone is taking care of this one.</span></div><button type="button" class="btn ghost">Pick another tag</button>';
+    act.querySelector('.btn').onclick=()=>dlg.close();
   }
   showCard(fromRect,y0);
 }
@@ -587,7 +592,8 @@ function showCard(fromRect,y0){
   if(window.scrollY!==y0) window.scrollTo(0,y0);
   placeDialog(fromRect,y0);
   if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:true},'*');
-  card.querySelector('.x').focus({preventScroll:true});
+  card.focus({preventScroll:true});
+  dlg.scrollTop=0;
   paintCard();
 }
 function reflow(){ paintCard(); if(LAST) placeDialog(LAST.r,LAST.y0); }

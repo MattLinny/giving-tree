@@ -122,9 +122,14 @@ function safe_(v) {
   return typeof v === 'string' && /^[=+\-@]/.test(v) ? "'" + v : v;
 }
 
+// NOTIFY_EMAIL can hold several addresses, separated by commas, semicolons or spaces.
+// Email trouble never blocks a submission: the row is already saved by the time this runs.
 function notify_(subject, body) {
-  const to = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL');
-  if (to) MailApp.sendEmail(to, subject, body);
+  const raw = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL') || '';
+  const to = raw.split(/[\s,;]+/).map(a => a.trim()).filter(a => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a));
+  if (!to.length) return;
+  try { MailApp.sendEmail(to.join(','), subject, body); }
+  catch (err) { console.error('Notification email failed: ' + err); }
 }
 
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
