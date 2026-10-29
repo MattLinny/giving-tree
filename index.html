@@ -191,6 +191,25 @@ dialog::backdrop{background:rgba(96,14,2,.6)}
   font-family:var(--wide);font-weight:800;font-stretch:112%;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--red-ink)}
 .seg input:checked + span{background:var(--red-ink);border-color:var(--red-ink);color:var(--cream)}
 .seg input:focus-visible + span{outline:3px solid var(--lav);outline-offset:2px}
+.cal-wrap{display:grid;gap:7px}
+.cal-l{font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--red-ink)}
+.cal{padding:12px 12px 10px;border:2px solid rgba(194,42,15,.32);border-radius:14px;background:#FFFBF4}
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-h b{font-family:var(--wide);font-weight:800;font-stretch:112%;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--red-ink)}
+.cal .nav{width:34px;height:34px;border-radius:50%;border:0;background:rgba(194,42,15,.1);color:var(--red-ink);font:400 22px/1 var(--serif);cursor:pointer}
+.cal .nav[disabled]{opacity:.25;cursor:default}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-g i{font:500 10px/1 var(--mono);letter-spacing:.1em;color:rgba(74,26,16,.5);padding:4px 0 6px;font-style:normal}
+.cal .d{height:36px;border-radius:10px;border:0;background:transparent;color:var(--ink);font:500 15px/1 var(--serif);cursor:pointer;position:relative}
+.cal .d:not([disabled]){background:rgba(194,42,15,.08);color:var(--red-ink);font-weight:600}
+.cal .d:not([disabled]):hover{background:rgba(194,42,15,.18)}
+.cal .d.sun:not([disabled])::after{content:'';position:absolute;left:50%;bottom:4px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--pine)}
+.cal .d[disabled]{color:rgba(74,26,16,.25);cursor:default}
+.cal .d.sel{background:var(--red-ink) !important;color:var(--cream) !important}
+.cal .d.sel::after{background:var(--cream) !important}
+.cal .d:focus-visible,.cal .nav:focus-visible{outline:3px solid var(--lav);outline-offset:1px}
+.cal-s{margin-top:10px;font:400 14.5px/1.35 var(--serif);color:var(--ink);text-align:center}
+.cal-s b{color:var(--red-ink)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .err{font:500 15px/1.4 var(--serif);color:var(--red-ink)}
 .btn[disabled]{opacity:.65;cursor:progress}
@@ -280,6 +299,10 @@ const CONFIG = {
   apiUrl: 'https://script.google.com/macros/s/AKfycbw0KhxHDvDLN_1A3ahRYKonqBuy08A5mmUkbWf687BYn-Zt9x5-L08Rr5b1gMm9jTUR_Q/exec',
   // Shown after someone claims a tag to bring in person. Leave '' to skip.
   dropoffNote: '',
+  // Drop-off calendar: weekdays 0=Sun…6=Sat. Weekday drop-off hours, and the last day gifts can come in.
+  dropoffDays: [0,2,3,4,5],
+  dropoffHours: '8:30–4',
+  dropoffLast: '12-21',   // MM-DD, this Christmas
   refreshMinutes: 5,
 };
 
@@ -623,6 +646,43 @@ function openNeedForm(from){
   });
   showCard(fromRect,y0);
 }
+/* Drop-off calendar: only the days gifts can come in are selectable. */
+const isSun=d=>d.getDay()===0;
+const longDate=d=>d.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+function dropoffText(d){ return longDate(d)+(isSun(d)?' · at church':' · '+CONFIG.dropoffHours); }
+function seeYou(d){ return d?`See you ${longDate(d)}${isSun(d)?' at church.':`, any time ${CONFIG.dropoffHours}.`}`:''; }
+function dropoffRange(){
+  const now=new Date(), first=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  const [m,dd]=CONFIG.dropoffLast.split('-').map(Number);
+  let last=new Date(now.getFullYear(),m-1,dd);
+  if(last<first) last=new Date(now.getFullYear()+1,m-1,dd);
+  return {first,last};
+}
+function buildCal(el,onPick){
+  const {first,last}=dropoffRange();
+  let view=new Date(first.getFullYear(),first.getMonth(),1), sel=null;
+  const ok=d=>d>=first&&d<=last&&CONFIG.dropoffDays.includes(d.getDay());
+  // start on the first month that actually has an open day
+  while(view<=last){ let any=false; for(let i=1;i<=31;i++){const d=new Date(view.getFullYear(),view.getMonth(),i); if(d.getMonth()!==view.getMonth())break; if(ok(d)){any=true;break}} if(any)break; view=new Date(view.getFullYear(),view.getMonth()+1,1); }
+  const draw=()=>{
+    const y=view.getFullYear(), mo=view.getMonth(), days=new Date(y,mo+1,0).getDate(), lead=new Date(y,mo,1).getDay();
+    const canPrev=new Date(y,mo,0)>=first, canNext=new Date(y,mo+1,1)<=last;
+    let g='';
+    for(let i=0;i<lead;i++) g+='<span></span>';
+    for(let i=1;i<=days;i++){
+      const d=new Date(y,mo,i), on=ok(d), s=sel&&+sel===+d;
+      g+=`<button type="button" class="d${isSun(d)?' sun':''}${s?' sel':''}" data-d="${i}" ${on?'':'disabled'} aria-pressed="${!!s}" aria-label="${longDate(d)}${on?'':', not available'}">${i}</button>`;
+    }
+    el.innerHTML=`<div class="cal-h"><button type="button" class="nav" data-m="-1" aria-label="Previous month" ${canPrev?'':'disabled'}>&lsaquo;</button>
+      <b>${view.toLocaleDateString('en-CA',{month:'long',year:'numeric'})}</b>
+      <button type="button" class="nav" data-m="1" aria-label="Next month" ${canNext?'':'disabled'}>&rsaquo;</button></div>
+      <div class="cal-g">${['S','M','T','W','T','F','S'].map(x=>`<i>${x}</i>`).join('')}${g}</div>
+      <p class="cal-s">${sel?`<b>${esc(longDate(sel))}</b> · ${isSun(sel)?'at church':esc(CONFIG.dropoffHours)}`:`Tuesday to Friday, ${esc(CONFIG.dropoffHours)}, or Sunday at church.`}</p>`;
+    el.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{ view=new Date(y,mo+(+b.dataset.m),1); draw(); });
+    el.querySelectorAll('.d:not([disabled])').forEach(b=>b.onclick=()=>{ sel=new Date(y,mo,+b.dataset.d); draw(); onPick(sel); el.querySelector('.d.sel')?.focus({preventScroll:true}); });
+  };
+  draw();
+}
 function pledgeForm(n){
   const num=String(n.id).padStart(2,'0');
   const act=card.querySelector('.actions');
@@ -630,7 +690,8 @@ function pledgeForm(n){
       <p class="lead">Leave your name so we know Tag ${num} is taken. We&rsquo;ll only use it to get in touch about this gift.</p>
       ${field('name','Your name','required maxlength="80" autocomplete="name"')}
       ${field('contact','Phone or email','required maxlength="120" autocomplete="email"')}
-      ${field('dropoff','When you&rsquo;ll drop it off','maxlength="80" placeholder="e.g. Sunday, December 14"',true)}
+      <div class="cal-wrap"><span class="cal-l">Drop-off day</span><div class="cal"></div></div>
+      <input type="hidden" name="dropoff">
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <p class="err" role="alert" hidden></p>
       <button class="btn primary" type="submit">Claim Tag ${num}</button>
@@ -638,12 +699,17 @@ function pledgeForm(n){
     </form>`;
   const form=act.querySelector('form');
   form.querySelector('.btn.ghost').onclick=()=>{ dlg.close(); const el=stage.querySelector(`.tag[data-id="${CSS.escape(n.id)}"]`); if(el) openCard(n,el); };
-  form.addEventListener('submit',e=>{ if(!form.checkValidity()){ e.stopImmediatePropagation(); e.preventDefault(); form.reportValidity(); } },true);
+  let picked=null;
+  buildCal(form.querySelector('.cal'),d=>{ picked=d; form.dropoff.value=dropoffText(d); form.querySelector('.err').hidden=true; reflow(); });
+  form.addEventListener('submit',e=>{
+    if(!form.checkValidity()){ e.stopImmediatePropagation(); e.preventDefault(); form.reportValidity(); return; }
+    if(!picked){ e.stopImmediatePropagation(); e.preventDefault(); const er=form.querySelector('.err'); er.textContent='Pick a drop-off day on the calendar.'; er.hidden=false; reflow(); }
+  },true);
   wireForm(form,d=>({action:'pledge',tag:n.id,...d}),()=>{
     n.status='claimed'; renderBar(); renderTree();
     card.querySelector('.st').textContent=LABEL.claimed; card.querySelector('.st').className='st claimed';
     card.querySelector('h2 .amt')?.remove();
-    act.innerHTML=`<div class="done-note"><b>Tag ${num} is yours. Thank you!</b>${CONFIG.dropoffNote?`<span>${esc(CONFIG.dropoffNote)}</span>`:'<span>We&rsquo;ll be in touch with drop-off details.</span>'}</div>
+    act.innerHTML=`<div class="done-note"><b>Tag ${num} is yours. Thank you!</b><span>${esc(seeYou(picked))}</span>${CONFIG.dropoffNote?`<span>${esc(CONFIG.dropoffNote)}</span>`:''}</div>
       <button type="button" class="btn primary">Done</button>`;
     act.querySelector('.btn').onclick=()=>dlg.close();
     reflow();
