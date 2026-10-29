@@ -29,7 +29,7 @@ button{font:inherit;color:inherit}
 
 /* header */
 .sec{display:flex;flex-direction:column;justify-content:center;min-height:var(--sec,720px)}
-.tree-sec{min-height:0;justify-content:flex-start;padding-top:clamp(56px,10vh,96px)}
+.tree-sec{min-height:0;justify-content:flex-start;padding-top:clamp(56px,10vh,96px);padding-bottom:clamp(80px,14vh,150px)}
 .head{position:relative;text-align:center;padding:0}
 .hero{padding-top:clamp(84px,12vh,128px)}
 .title{position:relative;display:inline-block}
@@ -147,6 +147,7 @@ h1 > span{display:block}
 @media (prefers-reduced-motion:reduce){.tag{animation:none}}
 
 /* modal */
+dialog.fixed{position:fixed;top:50% !important;transform:translate(-50%,-50%)}
 dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%);width:min(92vw,440px);max-width:none;max-height:none;
   border:0;padding:0;background:transparent;overflow:visible;color:var(--ink)}
 dialog::backdrop{background:rgba(96,14,2,.6)}
@@ -398,6 +399,7 @@ function treeSVG(L){
    When the embed script on the church site says it can (launch:true), Nucleus form links
    are handed to it so the site's own pop-up opens over the page. Otherwise they open in the same tab. */
 let CAN_LAUNCH=false;
+let VIEW=null; // the part of this frame the visitor can see, sent by the embed script
 const LAUNCHER=/^https:\/\/launcher\.nucleus\.church\//;
 function viaLauncher(a){
   a.addEventListener('click',e=>{
@@ -477,15 +479,15 @@ function openCard(n,from){
     const mail=CONFIG.contactEmail&&`mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(`Giving Tree · Tag ${num}`)}&body=${encodeURIComponent(`I'd like to fill: ${n.need}`)}`;
     const hand=CONFIG.pledgeUrl||mail;
     const memo=`Tag ${num} · ${n.need}`;
-    act.insertAdjacentHTML('beforeend','<div class="memo"><div class="mt"><span class="ml">Paste in memo</span><span class="mv"></span></div><button type="button">Copy</button></div>');
+    act.insertAdjacentHTML('beforeend','<div class="memo"><div class="mt"><span class="ml">Add this to the memo section</span><span class="mv"></span></div><button type="button">Copy</button></div>');
     const box=act.querySelector('.memo'), mb=box.querySelector('button');
     box.querySelector('.mv').textContent=memo;
-    const doCopy=()=>{ const ok=copyText(memo); box.classList.toggle('done',ok); mb.textContent=ok?'Copied':'Copy'; box.querySelector('.ml').textContent=ok?'Copied · paste in memo':'Paste in memo'; };
+    const doCopy=()=>{ const ok=copyText(memo); box.classList.toggle('done',ok); mb.textContent=ok?'Copied':'Copy'; box.querySelector('.ml').textContent=ok?'Copied · add it to the memo section':'Add this to the memo section'; };
     mb.onclick=doCopy;
     if(CONFIG.giveUrl){
       const amt=n.amount.replace(/[^0-9.]/g,'');
       const g=amt?`${CONFIG.giveUrl}${CONFIG.giveUrl.includes('?')?'&':'?'}default_amount=${amt}`:CONFIG.giveUrl;
-      act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${g}">Copy memo &amp; give online</a>`);
+      act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${g}">Give online &amp; copy memo</a>`);
       act.lastElementChild.addEventListener('click',doCopy);
     }
     if(hand){ act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_top" href="${hand.replace(/"/g,'&quot;')}">I\u2019ll bring it</a>`); viaLauncher(act.lastElementChild); }
@@ -497,6 +499,7 @@ function openCard(n,from){
   dlg.showModal();
   if(window.scrollY!==y0) window.scrollTo(0,y0);
   placeDialog(fromRect,y0);
+  if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:true},'*');
   card.querySelector('.x').focus({preventScroll:true});
   paintCard();
 }
@@ -514,12 +517,20 @@ function paintCard(){
   card.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
 }
 function placeDialog(r,y0){
-  const h=dlg.offsetHeight, vh=window.innerHeight;
+  if(parent===window){ dlg.classList.add('fixed'); return; }   // standalone: a normal fixed modal
+  const h=dlg.offsetHeight;
+  if(VIEW){                                                     // embedded: centre in what the visitor can see
+    const vt=Math.max(0,VIEW.top), vb=VIEW.top+VIEW.height;
+    dlg.style.top=(vt+Math.max(14,(vb-vt-h)/2))+'px';
+    return;
+  }
+  const vh=window.innerHeight;
   let top=r.top+r.height/2-h/2;
   top=Math.max(14,Math.min(top,vh-h-14));
   dlg.style.top=(y0+top)+'px';
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+dlg.addEventListener('close',()=>{ if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:false},'*'); });
 new ResizeObserver(paintCard).observe(card);
 const how=document.getElementById('how');
 new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5})}).observe(how);
@@ -567,7 +578,8 @@ function buildStickers(){
 buildStickers();
 function setSec(h){ document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px'); }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
-else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ if(d.launch) CAN_LAUNCH=true; setSec(d.height); postHeight(); } }); }
+else { setSec(740); addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='giving-tree:viewport'&&d.height){ if(d.launch) CAN_LAUNCH=true; setSec(d.height); postHeight(); }
+  if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
   return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="61" fill="#FFF4E2"/><circle cx="64" cy="64" r="55" fill="none" stroke="#C22A0F" stroke-width="2.5"/>`+
@@ -582,7 +594,7 @@ document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
 }));
 function postHeight(){
   if(parent===window) return;
-  requestAnimationFrame(()=>parent.postMessage({type:'giving-tree:height',height:document.documentElement.scrollHeight},'*'));
+  requestAnimationFrame(()=>parent.postMessage({type:'giving-tree:height',height:Math.ceil(document.querySelector('main').getBoundingClientRect().bottom+window.scrollY)},'*'));
 }
 async function refresh(first){
   try{ NEEDS=await loadNeeds(); failed=false }
