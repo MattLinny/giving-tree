@@ -23,3 +23,12 @@ addEventListener('message',function(e){var d=e.data;if(!d||e.source!==f.contentW
 addEventListener('resize',send);f.addEventListener('load',send);})();
 </script>
 ```
+
+## Forms that write to the sheet (optional)
+`apps-script/Code.gs` is a Google Apps Script that turns the Needs spreadsheet into a small backend:
+- **Submit a need** adds a row to the Needs tab with status `new` (hidden from the tree) plus the submitter's name and contact in private columns.
+- **I'll bring it** records the pledge on a Pledges tab and flips the tag to `claimed` immediately.
+- The tree reads only public fields (id, need, details, amount, status) through the script, so names and contact details never reach the page.
+
+Setup steps are at the top of `Code.gs`. Then put the web app URL in `CONFIG.apiUrl`.
+Once `apiUrl` is live, stop publishing the sheet to the web (File → Share → Publish to web → Stop publishing): the Needs tab now holds contact details.
