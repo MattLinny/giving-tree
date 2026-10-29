@@ -678,7 +678,7 @@ function showCard(fromRect,y0){
   dlg.classList.remove('out'); dlg.showModal();
   if(window.scrollY!==y0) window.scrollTo(0,y0);
   placeDialog(fromRect,y0);
-  if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:true},'*');
+  if(parent!==window){ holdPlace(); parent.postMessage({type:'giving-tree:modal',open:true},'*'); }
   card.focus({preventScroll:true});
   dlg.scrollTop=0;
   paintCard();
@@ -870,7 +870,21 @@ addEventListener('touchmove',e=>{
   if(inCard&&!(dy>0&&atTop)&&!(dy<0&&atEnd)) return;
   e.preventDefault();
 },{passive:false});
-dlg.addEventListener('close',()=>{ if(parent!==window) parent.postMessage({type:'giving-tree:modal',open:false},'*'); });
+dlg.addEventListener('close',()=>{ if(parent!==window){ holdPlace(); parent.postMessage({type:'giving-tree:modal',open:false},'*'); } });
+/* Locking and unlocking the site's scroll can throw some browsers (iOS Safari) back to the top of the page.
+   Remember where the visitor was and, if the site jumps in the next moment, put them back. */
+let HOLD=null;
+function holdPlace(){
+  if(!VIEW) return;
+  // opening near the footer, the embed script deliberately lines the frame's bottom up with the screen's
+  const top=Math.min(VIEW.top,docH()-VIEW.height);
+  HOLD={top,until:performance.now()+900};
+}
+function keepPlace(){
+  if(!HOLD||!CAN_STEP) return;
+  if(performance.now()>HOLD.until){ HOLD=null; return; }
+  if(Math.abs(VIEW.top-HOLD.top)>40){ parent.postMessage({type:'giving-tree:scroll',y:Math.round(HOLD.top+16),step:true},'*'); HOLD=null; }
+}
 new ResizeObserver(paintCard).observe(card);
 const how=document.getElementById('how');
 new ResizeObserver(()=>{const w=how.offsetWidth,h=how.offsetHeight; if(w&&h) how.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5})}).observe(how);
@@ -965,7 +979,7 @@ function setSec(h){
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
 else { addEventListener('message',e=>{ const d=e.data;
   if(d&&d.type==='giving-tree:viewport'&&d.height){ const first=!SEC; if(d.launch) CAN_LAUNCH=true; if(d.steps) CAN_STEP=true; if(setSec(d.height)||first) postHeight(first); }
-  if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); reveal(); } }); }
+  if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; keepPlace(); if(dlg.open) placeDialog(); reveal(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
   return `<svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="61" fill="#FFF4E2"/><circle cx="64" cy="64" r="55" fill="none" stroke="#C22A0F" stroke-width="2.5"/>`+
