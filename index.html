@@ -27,13 +27,17 @@ body::before{content:'';position:absolute;inset:0;pointer-events:none;
 body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;mix-blend-mode:soft-light;opacity:.34;
   background:url(tex/paper.webp) 0 0/1000px 1000px}
 button{font:inherit;color:inherit}
+.lede,.sec-head .help,.how h2,.card h2{text-wrap:balance}
+.how>p,.ask p,.card p,.steps p{text-wrap:pretty}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
 /* header */
 .sec{display:flex;flex-direction:column;justify-content:center;min-height:var(--sec,720px)}
+/* the strip under the site header when the next section is in place stays clear of this section's arrow */
+#s1,#s2{padding-bottom:72px}
 .tree-sec{min-height:0;justify-content:flex-start;padding-top:clamp(56px,10vh,96px);padding-bottom:clamp(80px,14vh,150px)}
 .head{position:relative;text-align:center;padding:0}
-.hero{padding-top:clamp(84px,12vh,128px)}
+.hero{padding-top:clamp(84px,12vh,128px);min-height:calc(var(--sec,720px) + 36px)}   /* the first screen, less a peek of the next */
 .title{position:relative;display:inline-block}
 h1{font:400 clamp(54px,11vw,136px)/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 h1 > span{display:block}
@@ -105,7 +109,7 @@ h1 > span{display:block}
 .k-t1{right:21%;top:-6px}
 .k-t2{left:17%;top:380px}
 .k-t3{right:15%;top:700px}
-.k-peace{left:3%;top:24px}
+.k-peace{left:3%;top:150px}
 .k-rejoice{right:5%;top:420px}
 @media (max-width:1239px){.title .stk{--k:.78}.k-glory{left:-19%}.k-joy{right:-23%}}
 /* wide screens: stickers run off the edges of the page */
@@ -121,17 +125,18 @@ h1 > span{display:block}
 @media (min-width:1600px){.stk{--k:1.18}}
 @media (max-width:879px){.stk.wide{display:none}}
 .stk.mo{display:none}
-/* phones and small tablets: shapes only around the title, and the arrow sits at the foot of the screen */
-@media (max-width:879px){
+/* phones and tablets: shapes only around the title (the word stickers crowd the intro below ~1240px),
+   and the arrow sits at the foot of the screen */
+@media (max-width:1239px){
   .title .stk:not(.mo){display:none} .stk.mo{display:block;--k:1}
   .hero{padding-top:84px;justify-content:flex-start}
   .hero .head{margin:auto 0;padding-bottom:8px}
   .hero .next{margin:32px auto 14px}
   .p-star{right:-30px;top:-92px}
   .p-spark{left:0;top:-58px}
-  .p-burst{left:-58px;bottom:4px}     /* level with the arrow, half off the left edge */
-  .p-glint{right:14px;bottom:100px}
-  .p-dot{right:74px;bottom:26px}
+  .p-burst{left:-58px;bottom:76px}     /* level with the arrow, half off the left edge */
+  .p-glint{right:14px;bottom:172px}
+  .p-dot{right:74px;bottom:98px}
 }
 @media (max-width:620px){
   .stk{--k:.6}.stk:not(.m){display:none}
@@ -146,6 +151,8 @@ h1 > span{display:block}
 .lg .tag .amt{font-size:14px;padding:6px 11px;right:-14px;top:-15px}
 .stage svg.tree{position:absolute;inset:0;overflow:visible;filter:drop-shadow(6px 8px 0 var(--red-deep))}
 .load{position:absolute;left:0;right:0;top:140px;text-align:center;font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.load.empty{top:60%;left:50%;right:auto;translate:-50% 0;width:max-content;max-width:86%;padding:12px 22px 10px;border-radius:999px;background:var(--cream);color:var(--red-ink);box-shadow:4px 5px 0 var(--red-deep);
+  font:400 clamp(20px,3.4vw,28px)/1.05 'Allenoire',var(--display);letter-spacing:0;text-transform:none;font-variant-ligatures:none}
 .tag{position:absolute;z-index:2;width:var(--tw);height:var(--th);border:0;background:none center/100% 100% no-repeat;cursor:pointer;
   color:var(--red-ink);text-align:center;
   transform-origin:50% calc(var(--hang) * -1);transform:rotate(var(--rot));
@@ -154,14 +161,14 @@ h1 > span{display:block}
 .tag::before{content:'';position:absolute;left:50%;bottom:100%;width:2px;height:var(--hang);margin-left:-1px;background:var(--cream)}
 .tag::after{content:'';position:absolute;left:50%;bottom:calc(100% + var(--hang) - 4px);width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--cream)}
 .tag .in{position:absolute;inset:0;display:flex;flex-direction:column;padding:13px 17px 10px}
-.sm .tag .in{padding:11px 12px 8px}
+.sm .tag .in{padding:11px calc(12px + var(--or,0px)) 8px calc(12px + var(--ol,0px))}   /* --ol/--or: how far a tag runs off the screen */
 .sm .tag .txt{font-stretch:108%;padding:0 14px}
 .tag .meta{display:flex;justify-content:space-between;font:500 var(--mf)/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .tag .txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 18px;
   font-family:var(--wide);font-weight:800;font-stretch:118%;font-size:var(--fs);line-height:1.12;text-transform:uppercase}
 .tag .txt span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tag.filled{color:var(--cream)}
-.tag.filled .txt span{text-decoration:line-through;text-decoration-thickness:1.5px}
+.tag.filled .txt span{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(255,244,226,.5)}   /* a light strike keeps the words readable */
 .tag:hover,.tag:focus-visible{animation:none;transform:rotate(0) scale(1.06);z-index:4;filter:drop-shadow(0 6px 0 rgba(6,36,24,.5))}
 .stage[data-f] .tag{opacity:.3}
 .stage[data-f=open] .tag.open,.stage[data-f=claimed] .tag.claimed,.stage[data-f=filled] .tag.filled{opacity:1}
@@ -283,14 +290,20 @@ button.btn{width:100%;font-family:var(--wide)}
   .lede{margin-top:28px}
   .next{margin-top:48px}
   .tree-sec{padding-top:64px;padding-bottom:104px}
-  .sm .tag .txt{padding:0 16px}
+  .sm .tag .txt{padding:0 calc(16px + var(--or,0px)) 0 calc(16px + var(--ol,0px))}
   .sm .tag.pl .amt{right:auto;left:-9px;transform:rotate(-6deg)}
   .wrap{padding:16px 10px 32px}
   .chips,.bar{gap:6px}
   .chip{height:34px;padding:0 10px 0 8px;gap:6px;font-size:10px;letter-spacing:.08em}
   .chip b{font-size:14px}
   .card{padding:34px 26px 28px}
-  .how{padding:28px 24px 26px}
+  .how{padding:26px 22px 22px}
+  /* phones: the card and its arrow fit one screen. The intro line repeats the hero and the steps, so it goes. */
+  .how>p{display:none}
+  .how h2{margin-bottom:0}
+  .steps{margin-top:18px;padding-top:16px;gap:12px}
+  .ask{margin-top:18px;padding-top:16px;gap:12px}
+  #s2 .next{width:92px;height:92px;margin-top:28px}
   .next{width:104px;height:104px}
   .sec-head{margin-bottom:20px}
   .lede{font-size:20px;max-width:320px}
@@ -321,7 +334,7 @@ button.btn{width:100%;font-family:var(--wide)}
         <li><b>3</b><div><h3>We&rsquo;ll do the rest.</h3><p>We&rsquo;ll mark it off the tree for you.</p></div></li>
       </ol>
       <div class="ask">
-        <p>Submissions are open until December 6. Submit for yourself or someone you know.</p>
+        <p id="ask-line"></p>
         <span id="submit"></span>
       </div>
     </section>
@@ -355,7 +368,8 @@ const CONFIG = {
   // Drop-off calendar: weekdays 0=Sun…6=Sat. Weekday drop-off hours, and the last day gifts can come in.
   dropoffDays: [0,2,3,4,5],
   dropoffHours: '8:30am – 4:00pm',
-  dropoffLast: '12-13',   // MM-DD, last day gifts can come in
+  dropoffLast: '2026-12-13',   // YYYY-MM-DD, last day gifts can come in. After it, "I'll bring it" is hidden.
+  submitBy: '2026-12-06',      // YYYY-MM-DD, last day to submit a need. After it, the form closes.
   refreshMinutes: 5,
 };
 
@@ -497,7 +511,7 @@ function treeSVG(L){
   d+=' Z';
   // garlands: looped strands across each tier
   let boughs='';
-  for(let j=0;j<tiers;j++){
+  for(let j=0;j<(L.W<560?0:tiers);j++){   // phones: tags fill the rows, so garlands would only peek out in scraps
     const top=j===0?y0:yb(j-1), bot=yb(j), yy=top+(bot-top)*.64, t=(yy-top)/(bot-top);
     const aa=j===0?0:a[j], hw=(aa+(bw(j)-aa)*t)*.84;
     const n=Math.max(3,Math.round(hw*2/(P.T*.6))), step=hw*2/n, dep=P.T*.15;
@@ -536,6 +550,7 @@ function treeSVG(L){
    are handed to it so the site's own pop-up opens over the page. Otherwise they open in the same tab. */
 let CAN_LAUNCH=false;
 let VIEW=null; // the part of this frame the visitor can see, sent by the embed script
+const SITE_HEAD=72; // height of the church site's fixed header that sits over the embed
 const LAUNCHER=/^https:\/\/launcher\.nucleus\.church\//;
 function viaLauncher(a){
   a.addEventListener('click',e=>{
@@ -564,7 +579,12 @@ function renderBar(){
     b.onclick=()=>{FILTER=FILTER===s?null:s; FILTER?stage.dataset.f=FILTER:delete stage.dataset.f; renderBar()};
     chips.append(b);
   }
-  if(CONFIG.apiUrl){
+  const by=monthDay(ymd(CONFIG.submitBy)), slot=document.getElementById('submit');
+  document.getElementById('ask-line').textContent=submissionsOpen()
+    ? `Submissions are open until ${by}. Submit for yourself or someone you know.`
+    : `Submissions closed on ${by}. Thank you to everyone who shared a need.`;
+  if(!submissionsOpen()) slot.replaceChildren();
+  else if(CONFIG.apiUrl){
     const b=document.createElement('button'); b.type='button'; b.className='pill-btn'; b.textContent='Submit a need';
     b.onclick=()=>openNeedForm(b); document.getElementById('submit').replaceChildren(b);
   } else if(CONFIG.submitUrl){
@@ -583,13 +603,16 @@ function renderTree(){
   stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${inked('top',top,100,100*ts)}`;
   if(!TREE_IN) rv(stage.querySelector('svg.tree'));
   if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
-  const theme=L.P;
+  if(!NEEDS.length&&LAST_DATA) stage.insertAdjacentHTML('beforeend','<div class="load empty">New tags are on the way</div>');
+  const sx=stage.getBoundingClientRect().left, vw=document.documentElement.clientWidth;
   for(const p of L.placed){
     const n=p.item, t=THEME[n.status];
     const el=document.createElement('button');
     el.className=`tag ${n.status}${p.x+L.P.T/2>L.cx+1?' pl':''}`; el.dataset.id=n.id;
     el.setAttribute('aria-label',`Tag ${n.id}: ${n.need}. ${LABEL[n.status]}.`);
-    el.style.cssText=`left:${p.x}px;top:${p.y}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;`+
+    // tags that run off the screen keep their number, status and text inside the visible part
+    const ol=Math.max(0,Math.round(-(sx+p.x))), or=Math.max(0,Math.round(sx+p.x+L.P.T-vw));
+    el.style.cssText=`left:${p.x}px;top:${p.y}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;--ol:${ol}px;--or:${or}px;`+
       `background-image:${ticketURL(L.P.T,L.P.H,{...t,r:L.P.T<110?8:L.P.T>150?12:10,d:L.P.T<110?5:L.P.T>150?7:6})}`;
     const num=String(n.id).padStart(2,'0');
     el.innerHTML=`<span class="in"><span class="meta"><span>${num}</span><span>${n.status==='open'?'':n.status==='filled'?'✓ Filled':'Claimed'}</span></span><span class="txt"><span></span></span></span>${n.status==='open'&&n.amount?`<span class="amt">$${n.amount.replace(/[^0-9.]/g,'')}</span>`:''}`;
@@ -609,6 +632,7 @@ function link(base,n){
 function openCard(n,from){
   const fromRect=from.getBoundingClientRect(), y0=window.scrollY;
   const num=String(n.id).padStart(2,'0');
+  dlg.setAttribute('aria-label',`Tag ${num}: ${n.need}`);
   card.innerHTML=`
     <button class="x" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M2 2l12 12M14 2L2 14"/></svg></button>
     <div class="top"><span>Tag ${num}</span><span class="st ${n.status}">${LABEL[n.status]}</span></div>
@@ -635,7 +659,7 @@ function openCard(n,from){
       act.insertAdjacentHTML('beforeend',`<a class="btn primary" target="_blank" rel="noopener" href="${g}">Give online &amp; copy memo</a>`);
       act.lastElementChild.addEventListener('click',doCopy);
     }
-    if(CONFIG.apiUrl){ act.insertAdjacentHTML('beforeend','<button type="button" class="btn ghost">I\u2019ll bring it</button>'); act.lastElementChild.onclick=()=>pledgeForm(n); }
+    if(CONFIG.apiUrl&&dropoffRange()){ act.insertAdjacentHTML('beforeend','<button type="button" class="btn ghost">I\u2019ll bring it</button>'); act.lastElementChild.onclick=()=>pledgeForm(n); }
     else if(hand){ act.insertAdjacentHTML('beforeend',`<a class="btn ghost" target="_top" href="${hand.replace(/"/g,'&quot;')}">I\u2019ll bring it</a>`); viaLauncher(act.lastElementChild); }
   } else {
     act.innerHTML=n.status==='filled'
@@ -686,6 +710,7 @@ function wireForm(form,build,onDone){
 }
 function openNeedForm(from){
   const fromRect=from.getBoundingClientRect(), y0=window.scrollY;
+  dlg.setAttribute('aria-label','Submit a need');
   card.innerHTML=`${X_BTN}
     <div class="top"><span>Submit a need</span></div>
     <h2>Tell us what&rsquo;s needed.</h2>
@@ -708,7 +733,7 @@ function openNeedForm(from){
   form.addEventListener('submit',e=>{ if(!form.checkValidity()){ e.stopImmediatePropagation(); e.preventDefault(); form.reportValidity(); } },true);
   wireForm(form,d=>({action:'need',...d}),()=>{
     card.innerHTML=`${X_BTN}<div class="top"><span>Submit a need</span></div><h2>Thank you.</h2>
-      <p>We&rsquo;ll look it over and hang it on the tree soon. Submissions are open until December 6.</p>
+      <p>We&rsquo;ll look it over and hang it on the tree soon.</p>
       <div class="actions"><button type="button" class="btn primary">Done</button></div>`;
     card.querySelector('.x').onclick=card.querySelector('.actions .btn').onclick=closeCard;
     reflow();
@@ -720,19 +745,26 @@ const isSun=d=>d.getDay()===0;
 const longDate=d=>d.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
 function dropoffText(d){ return longDate(d)+(isSun(d)?' · at church':' · '+CONFIG.dropoffHours); }
 function seeYou(d){ return d?`See you ${longDate(d)}${isSun(d)?' at church.':`, any time between ${CONFIG.dropoffHours.replace(' – ',' and ')}.`}`:''; }
+const ymd=s=>{ const [y,m,d]=String(s).split('-').map(Number); return new Date(y,m-1,d); };
+const today=()=>{ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); };
+const monthDay=d=>d.toLocaleDateString('en-CA',{month:'long',day:'numeric'});
+const submissionsOpen=()=>today()<=ymd(CONFIG.submitBy);
+// drop-offs run from tomorrow to the last day; null once that's passed (or no allowed weekday is left)
 function dropoffRange(){
-  const now=new Date(), first=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
-  const [m,dd]=CONFIG.dropoffLast.split('-').map(Number);
-  let last=new Date(now.getFullYear(),m-1,dd);
-  if(last<first) last=new Date(now.getFullYear()+1,m-1,dd);
-  return {first,last};
+  const t=today(), first=new Date(t.getFullYear(),t.getMonth(),t.getDate()+1), last=ymd(CONFIG.dropoffLast);
+  for(let d=new Date(first);d<=last;d.setDate(d.getDate()+1)) if(CONFIG.dropoffDays.includes(d.getDay())) return {first,last};
+  return null;
 }
 function buildCal(el,onPick){
   const {first,last}=dropoffRange();
   let view=new Date(first.getFullYear(),first.getMonth(),1), sel=null;
   const ok=d=>d>=first&&d<=last&&CONFIG.dropoffDays.includes(d.getDay());
   // start on the first month that actually has an open day
-  while(view<=last){ let any=false; for(let i=1;i<=31;i++){const d=new Date(view.getFullYear(),view.getMonth(),i); if(d.getMonth()!==view.getMonth())break; if(ok(d)){any=true;break}} if(any)break; view=new Date(view.getFullYear(),view.getMonth()+1,1); }
+  // open on the first month with at least four drop-off days left (else the first with any)
+  const openIn=v=>{ let c=0; for(let d=new Date(v);d.getMonth()===v.getMonth();d.setDate(d.getDate()+1)) if(ok(d)) c++; return c; };
+  let firstAny=null;
+  for(let v=new Date(view);v<=last;v=new Date(v.getFullYear(),v.getMonth()+1,1)){ const c=openIn(v); if(c&&!firstAny) firstAny=v; if(c>=4){ firstAny=null; view=v; break; } }
+  if(firstAny) view=firstAny;
   const draw=()=>{
     const y=view.getFullYear(), mo=view.getMonth(), days=new Date(y,mo+1,0).getDate(), lead=new Date(y,mo,1).getDay();
     const canPrev=new Date(y,mo,0)>=first, canNext=new Date(y,mo+1,1)<=last;
@@ -784,7 +816,7 @@ function pledgeForm(n){
     reflow();
   });
   reflow();
-  form.querySelector('input').focus({preventScroll:true});
+  if(!TOUCH) form.querySelector('input').focus({preventScroll:true});   // on phones the keyboard would cover the calendar
 }
 function copyText(t){
   try{
@@ -805,8 +837,9 @@ function placeDialog(r,y0){
   if(VIEW){                                                     // embedded: centre in what the visitor can see
     // near the bottom the site's footer may be in view; the embed script scrolls the page so this
     // frame fills the screen, so centre in that final position rather than chasing it
-    const vb=Math.min(VIEW.top+VIEW.height,docH()), vt=Math.max(0,vb-VIEW.height);
-    dlg.style.setProperty('--mh',Math.max(320,vb-vt-20)+'px');
+    // the site's fixed header (logo + menu) covers the top SITE_HEAD px of the screen, so keep the card below it
+    const vb=Math.min(VIEW.top+VIEW.height,docH()), vt=Math.max(0,vb-VIEW.height+SITE_HEAD);
+    dlg.style.setProperty('--mh',Math.max(320,vb-vt-16)+'px');
     const h=dlg.offsetHeight;
     dlg.style.top=(vt+Math.max(10,(vb-vt-h)/2))+'px';
     return;
@@ -926,7 +959,7 @@ function setSec(h){
   if(SEC&&TOUCH&&SEC.w===w&&Math.abs(SEC.h-h)<160) return false;
   if(SEC&&SEC.w===w&&SEC.h===h) return false;
   SEC={w,h};
-  document.documentElement.style.setProperty('--sec',Math.max(520,Math.round(h-44))+'px');
+  document.documentElement.style.setProperty('--sec',Math.max(480,Math.round(h-SITE_HEAD-8))+'px');
   return true;
 }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
@@ -954,7 +987,7 @@ function glide(to){
 document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
   const t=document.getElementById(b.dataset.next); if(!t) return;
   const y=t.getBoundingClientRect().top+scrollY;
-  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y},'*'); else glide(y);
+  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:y-SITE_HEAD+8},'*'); else glide(y);
 }));
 
 /* ───────── Reveal on scroll ─────────
@@ -993,10 +1026,14 @@ function postHeight(force){
   if(parent===window) return;
   requestAnimationFrame(()=>{ const h=docH(); if(h===SENT_H&&!force) return; SENT_H=h; parent.postMessage({type:'giving-tree:height',height:h},'*'); });
 }
+let LAST_DATA='';
 async function refresh(first){
+  const was=failed;
   try{ NEEDS=await loadNeeds(); failed=false }
   catch(e){ if(first||!NEEDS.length) failed=true }
-  renderBar(); renderTree();
+  const data=JSON.stringify(NEEDS);
+  if(!first&&data===LAST_DATA&&failed===was) return;   // nothing changed: leave the tree (and its animations) alone
+  LAST_DATA=data; renderBar(); renderTree();
 }
 new ResizeObserver(()=>{ if(Math.abs(stage.clientWidth-lastW)>1) renderTree() }).observe(stage);
 document.fonts&&document.fonts.ready.then(postHeight);
