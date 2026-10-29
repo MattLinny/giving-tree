@@ -12,13 +12,12 @@ Publish: File → Share → Publish to web → the "Needs" tab → CSV → paste
   style="width:100%;border:0;min-height:900px"></iframe>
 <script>
 (function(){var f=document.getElementById('giving-tree'),t=0;
-function send(){f.contentWindow.postMessage({type:'giving-tree:viewport',height:window.innerHeight,launch:true},'*');view();}
-function glide(to){var s=window.scrollY,d=to-s,D=Math.min(1600,Math.max(1100,Math.abs(d)*1.1)),t0=0,stop=0;if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.scrollTo(0,to);return;}function c(){stop=1;}addEventListener('wheel',c,{once:true,passive:true});addEventListener('touchstart',c,{once:true,passive:true});function k(t){if(stop)return;t0=t0||t;var p=Math.min(1,(t-t0)/D),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;window.scrollTo({top:s+d*e,behavior:'instant'});if(p<1)requestAnimationFrame(k);}requestAnimationFrame(k);}
+function send(){f.contentWindow.postMessage({type:'giving-tree:viewport',height:window.innerHeight,launch:true,steps:true},'*');view();}
 function view(){f.contentWindow.postMessage({type:'giving-tree:view',top:-f.getBoundingClientRect().top,height:window.innerHeight},'*');}
 addEventListener('scroll',function(){if(!t){t=1;requestAnimationFrame(function(){t=0;view();});}},{passive:true});
 addEventListener('message',function(e){var d=e.data;if(!d||e.source!==f.contentWindow)return;
  if(d.type==='giving-tree:height'){f.style.height=d.height+'px';send();}
- if(d.type==='giving-tree:scroll'){glide(f.getBoundingClientRect().top+window.scrollY+d.y-16);}
+ if(d.type==='giving-tree:scroll'){window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY+d.y-16,behavior:d.step?'instant':'smooth'});}
  if(d.type==='giving-tree:modal'){var r=f.getBoundingClientRect();if(d.open&&r.bottom<innerHeight)window.scrollBy({top:r.bottom-innerHeight,behavior:'instant'});document.documentElement.style.overflow=document.body.style.overflow=d.open?'hidden':'';if(d.open)view();}
  if(d.type==='giving-tree:launch'&&/^https:\/\/launcher\.nucleus\.church\//.test(d.href)){var a=document.createElement('a');a.href=d.href;a.style.display='none';document.body.appendChild(a);a.click();a.remove();}});
 addEventListener('resize',send);f.addEventListener('load',send);})();

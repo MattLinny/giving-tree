@@ -548,7 +548,7 @@ function treeSVG(L){
 /* ───────── Nucleus pop-ups ─────────
    When the embed script on the church site says it can (launch:true), Nucleus form links
    are handed to it so the site's own pop-up opens over the page. Otherwise they open in the same tab. */
-let CAN_LAUNCH=false;
+let CAN_LAUNCH=false, CAN_STEP=false;   // CAN_STEP: the embed script can follow a stepped glide
 let VIEW=null; // the part of this frame the visitor can see, sent by the embed script
 const SITE_HEAD=72; // height of the church site's fixed header that sits over the embed
 const LAUNCHER=/^https:\/\/launcher\.nucleus\.church\//;
@@ -964,7 +964,7 @@ function setSec(h){
 }
 if(parent===window){ setSec(innerHeight); addEventListener('resize',()=>{setSec(innerHeight);postHeight()}); }
 else { addEventListener('message',e=>{ const d=e.data;
-  if(d&&d.type==='giving-tree:viewport'&&d.height){ const first=!SEC; if(d.launch) CAN_LAUNCH=true; if(setSec(d.height)||first) postHeight(first); }
+  if(d&&d.type==='giving-tree:viewport'&&d.height){ const first=!SEC; if(d.launch) CAN_LAUNCH=true; if(d.steps) CAN_STEP=true; if(setSec(d.height)||first) postHeight(first); }
   if(d&&d.type==='giving-tree:view'){ VIEW={top:d.top,height:d.height}; if(dlg.open) placeDialog(); reveal(); } }); }
 function nextBadge(label,id){
   const t=(label.toUpperCase()+' \u2022 ').repeat(2);
@@ -984,10 +984,21 @@ function glide(to){
     scrollTo({top:from+d*e,behavior:'instant'}); if(p<1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
+/* In the embed the page drives the glide itself, one small step per frame, so it is slow and eased whatever
+   embed script it sits in. The site jumps to y-16 (frame coordinates) for each step. Older embed scripts
+   (no steps:true in their viewport message) get the single smooth-scroll they always had. */
+function glideSite(y){
+  if(!VIEW||REDUCED||!CAN_STEP){ parent.postMessage({type:'giving-tree:scroll',y},'*'); return; }   // older embed scripts can't follow steps
+  const from=VIEW.top+16, d=y-from, dur=Math.min(1600,Math.max(1100,Math.abs(d)*1.1)); let t0=null, stop=false;
+  const cancel=()=>{stop=true}; addEventListener('wheel',cancel,{once:true,passive:true}); addEventListener('touchstart',cancel,{once:true,passive:true});
+  const step=t=>{ if(stop) return; t0??=t; const p=Math.min(1,(t-t0)/dur), e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+    parent.postMessage({type:'giving-tree:scroll',y:Math.round(from+d*e),step:true},'*'); if(p<1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
 document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',()=>{
   const t=document.getElementById(b.dataset.next); if(!t) return;
   const y=t.getBoundingClientRect().top+scrollY;
-  if(parent!==window) parent.postMessage({type:'giving-tree:scroll',y:y-SITE_HEAD+8},'*'); else glide(y);
+  if(parent!==window) glideSite(y-SITE_HEAD+8); else glide(y);
 }));
 
 /* ───────── Reveal on scroll ─────────
