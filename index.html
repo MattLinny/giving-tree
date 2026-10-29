@@ -796,9 +796,10 @@ function pledgeForm(n){
   const num=String(n.id).padStart(2,'0');
   const act=card.querySelector('.actions');
   act.innerHTML=`<form class="f" novalidate>
-      <p class="lead">Leave your name so we know Tag ${num} is taken. We&rsquo;ll only use it to get in touch about this gift.</p>
+      <p class="lead">Leave your name so we know Tag ${num} is taken. We&rsquo;ll email you the details and only get in touch about this gift.</p>
       ${field('name','Your name','required maxlength="80" autocomplete="name"')}
-      ${field('contact','Phone or email','required maxlength="120" autocomplete="email"')}
+      ${field('email','Email','type="email" required maxlength="120" autocomplete="email" inputmode="email"')}
+      ${field('phone','Phone','type="tel" maxlength="40" autocomplete="tel"',true)}
       <div class="cal-wrap"><span class="cal-l">Drop-off day</span><div class="cal"></div></div>
       <input type="hidden" name="dropoff">
       <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -814,11 +815,12 @@ function pledgeForm(n){
     if(!form.checkValidity()){ e.stopImmediatePropagation(); e.preventDefault(); form.reportValidity(); return; }
     if(!picked){ e.stopImmediatePropagation(); e.preventDefault(); const er=form.querySelector('.err'); er.textContent='Pick a drop-off day on the calendar.'; er.hidden=false; reflow(); }
   },true);
-  wireForm(form,d=>({action:'pledge',tag:n.id,...d}),()=>{
+  // contact stays for older versions of the sheet script; newer ones use email (for the receipt) and phone
+  wireForm(form,d=>({action:'pledge',tag:n.id,...d,contact:[d.email,d.phone].filter(Boolean).join(' · ')}),data=>{
     n.status='claimed'; renderBar(); renderTree();
     card.querySelector('.st').textContent=LABEL.claimed; card.querySelector('.st').className='st claimed';
     card.querySelector('h2 .amt')?.remove();
-    act.innerHTML=`<div class="done-note"><b>Tag ${num} is yours. Thank you!</b><span>${esc(seeYou(picked))}</span>${CONFIG.dropoffNote?`<span>${esc(CONFIG.dropoffNote)}</span>`:''}</div>
+    act.innerHTML=`<div class="done-note"><b>Tag ${num} is yours. Thank you!</b><span>${esc(seeYou(picked))}</span><span>We&rsquo;ve emailed the details to ${esc(data.email)}.</span>${CONFIG.dropoffNote?`<span>${esc(CONFIG.dropoffNote)}</span>`:''}</div>
       <button type="button" class="btn primary">Done</button>`;
     act.querySelector('.btn').onclick=closeCard;
     reflow();
