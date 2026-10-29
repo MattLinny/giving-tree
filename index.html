@@ -303,7 +303,7 @@ const CONFIG = {
   dropoffNote: '',
   // Drop-off calendar: weekdays 0=Sun…6=Sat. Weekday drop-off hours, and the last day gifts can come in.
   dropoffDays: [0,2,3,4,5],
-  dropoffHours: '8:30–4',
+  dropoffHours: '8:30am – 4:00pm',
   dropoffLast: '12-13',   // MM-DD, last day gifts can come in
   refreshMinutes: 5,
 };
@@ -656,7 +656,7 @@ function openNeedForm(from){
 const isSun=d=>d.getDay()===0;
 const longDate=d=>d.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
 function dropoffText(d){ return longDate(d)+(isSun(d)?' · at church':' · '+CONFIG.dropoffHours); }
-function seeYou(d){ return d?`See you ${longDate(d)}${isSun(d)?' at church.':`, any time ${CONFIG.dropoffHours}.`}`:''; }
+function seeYou(d){ return d?`See you ${longDate(d)}${isSun(d)?' at church.':`, any time between ${CONFIG.dropoffHours.replace(' – ',' and ')}.`}`:''; }
 function dropoffRange(){
   const now=new Date(), first=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
   const [m,dd]=CONFIG.dropoffLast.split('-').map(Number);
