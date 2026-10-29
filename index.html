@@ -22,10 +22,10 @@ body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--seri
 body::before{content:'';position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
   background-size:72px 72px;background-position:center top}
-/* riso grid on kraft over the whole page: a neutral-grey scan, so soft-light adds pattern without shifting the colours */
-body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.32;
-  background:url(tex/grid.webp) 0 0/1000px 1000px}
-html.bg-diamond body::after{background-image:url(tex/diamond.webp)}   /* ?bg=diamond: the Brown 13 diamond screen instead */
+/* paper fibre over the whole page: a neutral-grey scan, so soft-light adds grain without shifting the colours */
+body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.34;
+  background:url(tex/paper.webp) 0 0/840px 840px}
+html.bg-diamond body::after{background:url(tex/diamond.webp) 0 0/1000px 1000px;opacity:.2}   /* ?bg=diamond: the Brown 13 diamond screen instead */
 button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
