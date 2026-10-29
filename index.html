@@ -22,9 +22,10 @@ body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--seri
 body::before{content:'';position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
   background-size:72px 72px;background-position:center top}
-/* paper fibre over the whole page: a neutral-grey scan, so soft-light adds grain without shifting the colours */
-body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.55;
-  background:url(tex/paper.webp) 0 0/840px 840px}
+/* riso grid on kraft over the whole page: a neutral-grey scan, so soft-light adds pattern without shifting the colours */
+body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.32;
+  background:url(tex/grid.webp) 0 0/1000px 1000px}
+html.bg-diamond body::after{background-image:url(tex/diamond.webp)}   /* ?bg=diamond: the Brown 13 diamond screen instead */
 button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
@@ -308,6 +309,7 @@ button.btn{width:100%;font-family:var(--wide)}
 <dialog id="dlg" aria-label="Tag details"><div class="card" id="card" tabindex="-1"></div></dialog>
 
 <script>
+if(/[?&]bg=diamond\b/.test(location.search)) document.documentElement.classList.add('bg-diamond');
 /* ───────── Config ───────── */
 const CONFIG = {
   // Google Sheet → File → Share → Publish to web → CSV. Leave '' to show the sample tags.
@@ -823,25 +825,26 @@ const STICKERS=[
 ];
 const FILL={cream:'#FFF4E2',lav:'#C9CCF6',green:'#17694B',gold:'#E8B03E'};
 const INK=f=>f==='green'?'#FFF4E2':'#C22A0F';
+const DOT={green:.55};   // dot screen scale per ink; the dark green reads best with a finer screen
 function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;p.push((c+Math.cos(a)*rad).toFixed(1)+','+(c+Math.sin(a)*rad).toFixed(1))}return p.join(' ')}
 /* Riso halftone: the scanned dot screen, cut to the shape and screened on top so the ink looks printed.
    Drawn at its native size (one image px per screen px) so every shape gets the same dot pitch. */
-function riso(id,shape,vb,w){
+function riso(id,shape,vb,w,k=1){
   if(id==null) return '';
-  const s=(450*vb/w).toFixed(1);
+  const s=(450*k*vb/w).toFixed(1);
   return `<clipPath id="rc${id}">${shape}</clipPath><image href="tex/dots.webp" width="${s}" height="${s}" preserveAspectRatio="none" clip-path="url(#rc${id})" style="mix-blend-mode:screen" opacity=".42"/>`;
 }
 function shapeSVG(kind,fill,id,w){
   const body=kind==='s8'
     ? `<polygon points="${starPts(8,46,19)}"/>`
     : `<path d="M50 4C54 38 62 46 96 50C62 54 54 62 50 96C46 62 38 54 4 50C38 46 46 38 50 4Z"/>`;
-  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g>${riso(id,body,100,w)}</svg>`;
+  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g>${riso(id,body,100,w,DOT[fill])}</svg>`;
 }
 function burstSVG(w,text,fs,fill='lav',id){
   const n=14,R=68,r=52,pts=[];
   for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;pts.push((75+Math.cos(a)*rad).toFixed(1)+','+(75+Math.sin(a)*rad).toFixed(1))}
   const poly=`<polygon points="${pts.join(' ')}"/>`;
-  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${text?'':riso(id,poly,150,w)}<text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${text?'':riso(id,poly,150,w,DOT[fill])}<text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
 }
 function badgeSVG(w,text,fill='cream'){
   const t=(text.toUpperCase()+' \u00b7 ');
