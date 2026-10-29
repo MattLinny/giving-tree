@@ -22,8 +22,9 @@ body{position:relative;overflow-x:clip;color:var(--cream);font-family:var(--seri
 body::before{content:'';position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,226,200,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,226,200,.14) 1px,transparent 1px);
   background-size:72px 72px;background-position:center top}
-body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:multiply;opacity:.38;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .06  0 0 0 0 0  0 0 0 .9 -.28'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+/* paper fibre over the whole page: a neutral-grey scan, so soft-light adds grain without shifting the colours */
+body::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:50;mix-blend-mode:soft-light;opacity:.55;
+  background:url(tex/paper.webp) 0 0/840px 840px}
 button{font:inherit;color:inherit}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:22px 16px 40px}
 
@@ -174,6 +175,10 @@ dialog{position:absolute;inset:auto;margin:0;left:50%;transform:translateX(-50%)
 dialog::backdrop{background:rgba(96,14,2,.6)}
 .card:focus{outline:none}
 .card{position:relative;padding:36px 34px 32px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep))}
+/* a light kraft grain on the pop-up card, cut to the ticket shape and kept under the text */
+.card::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;mix-blend-mode:multiply;opacity:.2;
+  background:url(tex/paper.webp) 0 0/560px 560px,#C99A62;background-blend-mode:soft-light;
+  -webkit-mask:var(--tk) 0 0/100% 100% no-repeat;mask:var(--tk) 0 0/100% 100% no-repeat}
 .card .top{display:flex;justify-content:space-between;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--red-ink);opacity:.6}
 .card .st.filled{color:var(--pine)}
 .card h2 .amt{display:inline-block;vertical-align:.22em;margin-left:.15em;padding:.32em .6em;border-radius:999px;background:var(--red-ink);color:var(--cream);font:800 .38em/1 var(--wide);font-stretch:112%;letter-spacing:.02em;white-space:nowrap}
@@ -540,7 +545,8 @@ function renderTree(){
   stage.style.setProperty('--tw',L.P.T+'px'); stage.style.setProperty('--th',L.P.H+'px');
   stage.style.setProperty('--fs',L.P.fs+'px'); stage.style.setProperty('--mf',L.P.mf+'px');
   stage.innerHTML=`<svg class="tree" viewBox="0 0 ${W} ${L.H}" width="${W}" height="${L.H}" aria-hidden="true">${treeSVG(L)}</svg>`;
-  stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>`;
+  const top=`<polygon points="${starPts(8,46,20)}"/>`, ts=W<560?.9:L.P.T>150?1.2:1;
+  stage.querySelector('#star').innerHTML=`<polygon points="${starPts(8,46,20)}" fill="#E8B03E" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${riso('top',top,100,100*ts)}`;
   if(failed){ stage.insertAdjacentHTML('beforeend','<div class="load">Couldn’t load the tree</div>'); return }
   const theme=L.P;
   for(const p of L.placed){
@@ -754,7 +760,8 @@ function copyText(t){
 }
 function paintCard(){
   const w=card.offsetWidth,h=card.offsetHeight; if(!w||!h) return;
-  card.style.backgroundImage=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
+  const tk=ticketURL(w,h,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
+  card.style.backgroundImage=tk; card.style.setProperty('--tk',tk);
 }
 function placeDialog(r,y0){
   if(parent===window){ dlg.classList.add('fixed'); return; }   // standalone: a normal fixed modal
@@ -817,16 +824,24 @@ const STICKERS=[
 const FILL={cream:'#FFF4E2',lav:'#C9CCF6',green:'#17694B',gold:'#E8B03E'};
 const INK=f=>f==='green'?'#FFF4E2':'#C22A0F';
 function starPts(n,R,r,c=50){const p=[];for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;p.push((c+Math.cos(a)*rad).toFixed(1)+','+(c+Math.sin(a)*rad).toFixed(1))}return p.join(' ')}
-function shapeSVG(kind,fill){
+/* Riso halftone: the scanned dot screen, cut to the shape and screened on top so the ink looks printed.
+   Drawn at its native size (one image px per screen px) so every shape gets the same dot pitch. */
+function riso(id,shape,vb,w){
+  if(id==null) return '';
+  const s=(450*vb/w).toFixed(1);
+  return `<clipPath id="rc${id}">${shape}</clipPath><image href="tex/dots.webp" width="${s}" height="${s}" preserveAspectRatio="none" clip-path="url(#rc${id})" style="mix-blend-mode:screen" opacity=".42"/>`;
+}
+function shapeSVG(kind,fill,id,w){
   const body=kind==='s8'
     ? `<polygon points="${starPts(8,46,19)}"/>`
     : `<path d="M50 4C54 38 62 46 96 50C62 54 54 62 50 96C46 62 38 54 4 50C38 46 46 38 50 4Z"/>`;
-  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g></svg>`;
+  return `<svg viewBox="0 0 100 100"><g fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="6" stroke-linejoin="round">${body}</g>${riso(id,body,100,w)}</svg>`;
 }
-function burstSVG(w,text,fs,fill='lav'){
+function burstSVG(w,text,fs,fill='lav',id){
   const n=14,R=68,r=52,pts=[];
   for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2,rad=i%2?r:R;pts.push((75+Math.cos(a)*rad).toFixed(1)+','+(75+Math.sin(a)*rad).toFixed(1))}
-  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/><text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
+  const poly=`<polygon points="${pts.join(' ')}"/>`;
+  return `<svg width="${w}" height="${w}" viewBox="0 0 150 150"><polygon points="${pts.join(' ')}" fill="${FILL[fill]}" stroke="#FFF4E2" stroke-width="7" stroke-linejoin="round"/>${text?'':riso(id,poly,150,w)}<text x="75" y="${75+(fs||46)*.34}" fill="${INK(fill)}" style="font-size:${fs||46}px">${text}</text></svg>`;
 }
 function badgeSVG(w,text,fill='cream'){
   const t=(text.toUpperCase()+' \u00b7 ');
@@ -844,8 +859,8 @@ function buildStickers(){
       el.style.width=d.w+'px'; el.style.height=d.h+'px';
       el.style.backgroundImage=ticketURL(d.w,d.h,{fill:FILL[d.fill],stroke:INK(d.fill),r:13,d:8,sw:2.5}); el.style.color=INK(d.fill);
       el.textContent=d.text;
-    } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs,d.fill);
-    else if(d.kind==='s8'||d.kind==='s4') el.innerHTML=shapeSVG(d.kind,d.fill);
+    } else if(d.kind==='b') el.innerHTML=burstSVG(d.w,d.text,d.fs,d.fill,i);
+    else if(d.kind==='s8'||d.kind==='s4') el.innerHTML=shapeSVG(d.kind,d.fill,d.w>=48?i:null,d.w);   // small stars stay flat: too few dots to read
     else el.innerHTML=badgeSVG(d.w,d.text,d.fill).replaceAll('%ID%',i);
     host.append(el);
   });
