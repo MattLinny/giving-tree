@@ -26,7 +26,7 @@ const HIDDEN = ['new', 'review', 'pending', 'removed', 'hidden'];
 
 // Shown in the email someone gets after claiming a tag. Edit to match how drop-off works at your church.
 const CHURCH = 'Oceanside Church';
-const DROPOFF_WEEKDAY = 'the church office';                        // e.g. 'the church office, 123 Example St'
+const DROPOFF_WEEKDAY = 'the church office at 2304 Jingle Pot Road';
 const DROPOFF_SUNDAY = 'church on Sunday at Nanaimo Christian School';
 
 function setup() {
