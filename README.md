@@ -8,7 +8,7 @@ Publish: File → Share → Publish to web → the "Needs" tab → CSV → paste
 
 ## Embed
 ```html
-<iframe id="giving-tree" src="https://YOUR-USER.github.io/giving-tree/" allow="clipboard-write" title="Christmas Giving Tree"
+<iframe id="giving-tree" src="https://givingtree.oceansidechurch.ca/" allow="clipboard-write" title="Christmas Giving Tree"
   style="width:100%;border:0;min-height:900px"></iframe>
 <script>
 (function(){var f=document.getElementById('giving-tree'),t=0,ly=0;
@@ -34,7 +34,7 @@ Setup steps are at the top of `Code.gs`. Then put the web app URL in `CONFIG.api
 Once `apiUrl` is live, stop publishing the sheet to the web (File → Share → Publish to web → Stop publishing): the Needs tab now holds contact details.
 
 ## Sunday TV display
-`https://mattlinny.github.io/giving-tree/tv.html` (same as `/?tv`). A portrait, full-screen tree with a QR code
+`https://givingtree.oceansidechurch.ca/tv.html` (same as `/?tv`). A portrait, full-screen tree with a QR code
 to `CONFIG.tvLink`, live counts, and a check of the sheet every `CONFIG.tvRefreshSeconds` (newly claimed tags light up).
 Add `?rotate` (`tv.html?rotate`) when the screen is mounted on its side but the computer's display isn't rotated.
 
