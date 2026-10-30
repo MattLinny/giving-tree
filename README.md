@@ -37,3 +37,5 @@ Once `apiUrl` is live, stop publishing the sheet to the web (File → Share → 
 `https://mattlinny.github.io/giving-tree/tv.html` (same as `/?tv`). A portrait, full-screen tree with a QR code
 to `CONFIG.tvLink`, live counts, and a check of the sheet every `CONFIG.tvRefreshSeconds` (newly claimed tags light up).
 Add `?rotate` (`tv.html?rotate`) when the screen is mounted on its side but the computer's display isn't rotated.
+
+`pick.html` (same as `/?pick`) opens straight on the tree with no intro. The TV's QR code points there.

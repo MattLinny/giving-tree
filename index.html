@@ -321,6 +321,10 @@ button.btn{width:100%;font-family:var(--wide)}
   .steps p{font-size:14.5px}
 }
 
+/* ───────── Tags only (?pick): straight to the tree ───────── */
+html.pick #s1,html.pick #s2{display:none}
+html.pick .tree-sec{padding-top:40px}
+
 /* ───────── TV display (?tv): QR + title on top, the tree filling a portrait screen ───────── */
 .tvhead{display:none}
 html.tv,html.tv body{height:100%;overflow:hidden;cursor:none}
@@ -383,6 +387,8 @@ html.tv.rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;transform-
 <script>
 // ?tv turns this page into the Sunday TV display (add &rotate if the screen is on its side but the computer isn't)
 const TV=/[?&]tv\b/.test(location.search);
+// ?pick opens straight on the tree (no intro), for people arriving from a QR code
+if(/[?&]pick\b/.test(location.search)) document.documentElement.classList.add('pick');
 if(TV) document.documentElement.classList.add('tv'), /[?&]rotate\b/.test(location.search)&&document.documentElement.classList.add('rot');
 /* ───────── Config ───────── */
 const CONFIG = {
@@ -407,7 +413,7 @@ const CONFIG = {
   submitBy: '2026-12-06',      // YYYY-MM-DD, last day to submit a need. After it, the form closes.
   refreshMinutes: 5,
   // TV display: where the QR code sends people, and how often it checks the sheet for claims (seconds)
-  tvLink: 'https://oceansidechurch.ca/christmas-giving-tree',
+  tvLink: 'https://mattlinny.github.io/giving-tree/?pick',   // opens straight on the tags
   tvRefreshSeconds: 15,
 };
 
