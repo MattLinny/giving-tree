@@ -36,6 +36,6 @@ Once `apiUrl` is live, stop publishing the sheet to the web (File → Share → 
 ## Sunday TV display
 `https://givingtree.oceansidechurch.ca/tv.html` (same as `/?tv`). A portrait, full-screen tree with a QR code
 to `CONFIG.tvLink`, live counts, and a check of the sheet every `CONFIG.tvRefreshSeconds` (newly claimed tags light up).
-Add `?rotate` (`tv.html?rotate`) when the screen is mounted on its side but the computer's display isn't rotated.
+Add `?rotate` (`tv.html?rotate`) when the screen is mounted on its side but the computer's display isn't rotated; `tv.html?rotate=left` turns it the other way.
 
 `pick.html` (same as `/?pick`) opens straight on the tree with no intro. The TV's QR code points there.

@@ -347,6 +347,7 @@ html.tv .tvhead{display:flex;align-items:center;gap:44px;position:relative;z-ind
 @keyframes cheer{0%,100%{scale:1}35%{scale:1.24}65%{scale:.97}}
 /* ?tv&rotate: for a screen mounted on its side when the computer can't rotate its display */
 html.tv.rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
 </style>
 </head>
 <body>
@@ -385,11 +386,11 @@ html.tv.rot body{position:fixed;top:0;left:0;width:100vh;height:100vw;transform-
 <dialog id="dlg" aria-label="Tag details"><div class="card" id="card" tabindex="-1"></div></dialog>
 
 <script>
-// ?tv turns this page into the Sunday TV display (add &rotate if the screen is on its side but the computer isn't)
+// ?tv turns this page into the Sunday TV display (add &rotate, or &rotate=left for the other way, if the screen is on its side but the computer isn't)
 const TV=/[?&]tv\b/.test(location.search);
 // ?pick opens straight on the tree (no intro), for people arriving from a QR code
 if(/[?&]pick\b/.test(location.search)) document.documentElement.classList.add('pick');
-if(TV) document.documentElement.classList.add('tv'), /[?&]rotate\b/.test(location.search)&&document.documentElement.classList.add('rot');
+if(TV) document.documentElement.classList.add('tv'), /[?&]rotate\b/.test(location.search)&&document.documentElement.classList.add('rot'), /[?&]rotate=left\b/.test(location.search)&&document.documentElement.classList.add('left');
 /* ───────── Config ───────── */
 const CONFIG = {
   // Google Sheet → File → Share → Publish to web → CSV. Leave '' to show the sample tags.
