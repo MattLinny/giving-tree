@@ -328,17 +328,18 @@ html.pick .tree-sec{padding-top:40px}
 /* ───────── TV display (?tv): QR + title on top, the tree filling a portrait screen ───────── */
 .tvhead{display:none}
 html.tv,html.tv body{height:100%;overflow:hidden;cursor:none}
-html.tv .wrap{max-width:none;height:100%;display:flex;flex-direction:column;padding:56px 44px 0}
+html.tv .wrap{max-width:none;height:100%;padding:0;position:relative}
 html.tv #s1,html.tv #s2,html.tv .sec-head,html.tv .bar,html.tv .stk{display:none}
-html.tv #s3{flex:1;min-height:0;display:block;padding:0;overflow:visible}
+html.tv #s3{height:100%;display:flow-root;padding:0;overflow:visible}
+html.tv .stage svg.tree.rv.in{translate:0 0}
 html.tv .stage{width:1000px;margin:0;transform-origin:50% 0;pointer-events:none}   /* drawn at the large size, then scaled to fit */
-html.tv .tvhead{display:flex;align-items:center;gap:44px;position:relative;z-index:3;margin-bottom:10px}
+html.tv .tvhead{display:flex;align-items:flex-start;gap:44px;position:absolute;top:44px;left:44px;right:44px;z-index:3}
 .tvqr{flex:none;width:300px;padding:26px 26px 20px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
 .tvqr svg{display:block;width:100%;height:auto}
 .tvqr span{display:block;margin-top:12px;font:800 17px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase}
-.tvt{min-width:0}
+.tvt{flex:1;min-width:0}
 .tvtitle{font:400 104px/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
-.tvcount{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.tvcount{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-top:24px}
 .tvcount .chip{height:48px;padding:0 20px 0 14px;font-size:14px;cursor:default}
 .tvcount .chip b{font-size:20px}
 /* a tag that was just claimed cheers, then settles */
@@ -1126,15 +1127,16 @@ refresh(!cached);
 if(CONFIG.apiUrl||CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),TV?CONFIG.tvRefreshSeconds*1000:(CONFIG.apiUrl?1:CONFIG.refreshMinutes)*60000);
 
 /* ───────── TV display ───────── */
-// scale the tree to fill what's left of the screen under the header
-// scale the tree to fill what's left of the screen under the header, by the tree's own width (not the stage's)
+// fill the screen under the title: branch tips may run off the sides, the tags stay on screen
 function fitTV(){
-  const box=document.getElementById('s3'), L=LAST_L; if(!L) return;
-  const treeW=2*Math.max(...L.b.slice(0,L.tiers),L.bLast)+60, H=stage.offsetHeight;
-  const k=Math.min(1.8,box.clientHeight/H,box.clientWidth/treeW);
+  const box=document.getElementById('s3'), L=LAST_L, tree=stage.querySelector('svg.tree'); if(!L||!tree) return;
+  const head=document.querySelector('.tvhead'), title=document.querySelector('.tvtitle');
+  const top=head.offsetTop+title.offsetTop+title.offsetHeight+12, bb=tree.getBBox();
+  const reach=Math.max(...L.placed.map(p=>Math.abs(p.x+L.P.T/2-L.cx)+L.P.T/2));
+  const k=Math.min(1.8,(box.clientHeight-top-20)/bb.height,(box.clientWidth/2-28)/reach);
   stage.style.scale=k.toFixed(3);
   stage.style.marginLeft=((box.clientWidth-stage.offsetWidth)/2)+'px';
-  stage.style.marginTop=Math.max(0,(box.clientHeight-H*k)/2)+'px';
+  stage.style.marginTop=(top-bb.y*k+Math.max(0,(box.clientHeight-top-20-bb.height*k)/2))+'px';
 }
 function cheer(){
   if(!JUST.size) return;
@@ -1143,6 +1145,7 @@ function cheer(){
 }
 if(TV){
   addEventListener('resize',()=>{ renderTree(); });
+  document.fonts?.ready.then(fitTV);
   const q=document.getElementById('tvqr');
   q.style.backgroundImage=ticketURL(300,370,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
   const sc=document.createElement('script'); sc.src='vendor/qrcode.js';
