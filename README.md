@@ -39,4 +39,4 @@ to `CONFIG.tvLink` and a check of the sheet every `CONFIG.tvRefreshSeconds` (new
 Add `?rotate` (`tv.html?rotate`) when the screen is mounted on its side but the computer's display isn't rotated; `tv.html?rotate=left` turns it the other way.
 
 `pick.html` (same as `/?pick`) opens straight on the tree with no intro. The TV's QR code points there.
-`submit.html` (same as `/?submit`) opens the same view with the submission form on top. The TV's second QR code points there and disappears after `CONFIG.submitBy`.
+`submit.html` (same as `/?submit`) opens the same view with the submission form on top. The blank tag at the end of the tree links there (on the TV, by a small QR code) and disappears after `CONFIG.submitBy`.

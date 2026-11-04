@@ -169,6 +169,12 @@ h1 > span{display:block}
 .tag .txt span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tag.filled{color:var(--cream)}
 .tag.filled .txt span{color:rgba(255,244,226,.72);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--cream)}   /* dimmed words under a solid strike: clearly crossed off, still readable */
+.tag.add{color:var(--cream)}
+.tag.add::before,.tag.add::after{opacity:.8}
+.addqr{display:block;width:124px;margin:15px auto 0;padding:5px;background:var(--cream);border-radius:6px}
+.addqr svg{display:block;width:100%;height:auto}
+.addl{display:block;margin-top:9px;font:800 12px/1 var(--wide);font-stretch:118%;letter-spacing:.03em;text-transform:uppercase}
+html.tv .tag.add{animation:none;transform:none}   /* held still so it scans */
 .tag:hover,.tag:focus-visible{animation:none;transform:rotate(0) scale(1.06);z-index:4;filter:drop-shadow(0 6px 0 rgba(6,36,24,.5))}
 .stage[data-f] .tag{opacity:.3}
 .stage[data-f=open] .tag.open,.stage[data-f=claimed] .tag.claimed,.stage[data-f=filled] .tag.filled{opacity:1}
@@ -335,11 +341,10 @@ html.tv .stage svg.tree.rv.in{translate:0 0}
 html.tv .stage{width:1000px;margin:0;transform-origin:50% 0;pointer-events:none}   /* drawn at the large size, then scaled to fit */
 html.tv .tvhead{display:block;position:absolute;top:calc(44px*var(--u,1));left:calc(44px*var(--u,1));width:992px;z-index:3;transform-origin:0 0;transform:scale(var(--u,1))}   /* laid out on a 1080-wide screen, then scaled to the real one */
 html.tv body{background-size:calc(750px*var(--u,1)) calc(750px*var(--u,1))}
-.tvqr{flex:none;width:236px;padding:20px 20px 15px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
+.tvqr{flex:none;width:300px;padding:24px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
 .tvqr svg{display:block;width:100%;height:auto}
-.tvqr span{display:block;margin-top:9px;font:800 15px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .tvqrs{display:flex;justify-content:space-between;margin-top:20px}
-.tvqr[hidden]{display:none}
+.tvcall{padding-top:8px;font:400 66px/1.02 'Allenoire',var(--display);font-variant-ligatures:none;text-align:right;text-shadow:3px 4px 0 var(--red-deep)}
 .tvtitle{width:max-content;white-space:nowrap;font:400 100px/.9 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 /* a tag that was just claimed cheers, then settles */
 .tag.just{z-index:6;animation:sway var(--dur) ease-in-out var(--delay) infinite alternate,cheer 1.1s cubic-bezier(.3,1.5,.5,1) 0s 3;
@@ -355,8 +360,8 @@ html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
   <header class="tvhead" aria-hidden="true">
     <div class="tvtitle">Christmas Giving Tree</div>
     <div class="tvqrs">
-      <div class="tvqr" data-link="tvLink"><div></div><span>Pick a tag</span></div>
-      <div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Submit a need</span></div>
+      <div class="tvqr" id="tvqr"></div>
+      <div class="tvcall">Scan to<br>pick a tag.</div>
     </div>
   </header>
   <section class="sec hero" id="s1">
@@ -495,11 +500,11 @@ const THEME = {
   claimed:{fill:'#C9CCF6', stroke:'#C22A0F'},
   filled: {fill:'#0B3A2A', stroke:'#FFF4E2'},
 };
-function ticketURL(w,h,{fill,stroke,r=10,d=6,sw=2}){
+function ticketURL(w,h,{fill,stroke,r=10,d=6,sw=2,dash=''}){
   const R=r+d, k=Math.sqrt(R*R-d*d);
   const o=`M${r} 0H${w-r}A${r} ${r} 0 0 0 ${w} ${r}V${h-r}A${r} ${r} 0 0 0 ${w-r} ${h}H${r}A${r} ${r} 0 0 0 0 ${h-r}V${r}A${r} ${r} 0 0 0 ${r} 0Z`;
   const i=`M${k} ${d}H${w-k}A${R} ${R} 0 0 0 ${w-d} ${k}V${h-k}A${R} ${R} 0 0 0 ${w-k} ${h-d}H${k}A${R} ${R} 0 0 0 ${d} ${h-k}V${k}A${R} ${R} 0 0 0 ${k} ${d}Z`;
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${o}" fill="${fill}"/><path d="${i}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/></svg>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${o}" fill="${fill}"/><path d="${i}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"${dash?` stroke-dasharray="${dash}" stroke-linecap="round"`:''}/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 function asterisk(el,{outer='#FFF4E2',inner='#E0361A',w=24,iw=11}={}){
@@ -509,6 +514,7 @@ function asterisk(el,{outer='#FFF4E2',inner='#E0361A',w=24,iw=11}={}){
 function hash(s){let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 
 /* ───────── Tree layout ───────── */
+const ADD_TV_EXTRA=76;   // the blank tag is taller on the TV, it carries a QR code
 function layout(items,W){
   const m=W<560;
   // phones: three tags span the widest rows and run ~12px off each edge of the screen
@@ -541,7 +547,7 @@ function layout(items,W){
   }
   const tiers=Math.max(tier,2); ensure(tiers-1);
   // a last tier that only used its first row is cut short, keeping its slope
-  const lastH=(tier>=3&&lastRows===1)?P.hang+P.H+P.bot+8:tierH;
+  const lastH=((tier>=3&&lastRows===1)?P.hang+P.H+P.bot+8:tierH)+(TV&&items.at(-1)?.add?ADD_TV_EXTRA:0);
   const k=tiers-1;
   const bLast=a[k]+(b[k]-a[k])*(lastH/tierH);
   return {P,placed,tiers,tierH,lastH,bLast,a,b,cx,y0,W,H:y0+k*tierH+lastH+110};
@@ -643,9 +649,22 @@ function renderBar(){
     a.textContent='Submit a need'; document.getElementById('submit').replaceChildren(a);
   }
 }
+// the blank tag: where a new need can be added
+function addTag(p,L,W){
+  const el=document.createElement('button'), h=L.P.H+(TV?ADD_TV_EXTRA:0);
+  el.className='tag add'; el.dataset.id='add'; el.setAttribute('aria-label','Submit a need');
+  el.style.cssText=`left:${p.x}px;top:${p.y}px;height:${h}px;--hang:${p.hang}px;--rot:${p.rot}deg;--dur:${p.dur}s;--delay:${p.delay}s;`+
+    `background-image:${ticketURL(L.P.T,h,{fill:'rgba(255,244,226,.12)',stroke:'#FFF4E2',r:L.P.T<110?8:L.P.T>150?12:10,d:L.P.T<110?5:L.P.T>150?7:6,sw:2.5,dash:'7 7'})}`;
+  el.innerHTML=TV?`<span class="addqr">${qrSVG(CONFIG.tvSubmitLink)}</span><span class="addl">Have a need?</span>`
+    :`<span class="txt"><span>Have a need?<br>Add it here.</span></span>`;
+  el.onclick=()=>openNeedForm(el);
+  if(!SEEN.has('add')) rv(el,.04+(p.x/W)*.22,1);
+  return el;
+}
 function renderTree(){
   const W=Math.max(300,Math.min(stage.clientWidth||960,1240)); lastW=stage.clientWidth;
-  const L=layout(NEEDS,W); LAST_L=L;
+  const adding=LAST_DATA&&CONFIG.apiUrl&&submissionsOpen();
+  const L=layout(adding?[...NEEDS,{id:'add',add:true}]:NEEDS,W); LAST_L=L;
   stage.style.height=L.H+'px'; stage.classList.toggle('sm',W<560); stage.classList.toggle('lg',W>=1000);
   stage.style.setProperty('--tw',L.P.T+'px'); stage.style.setProperty('--th',L.P.H+'px');
   stage.style.setProperty('--fs',L.P.fs+'px'); stage.style.setProperty('--mf',L.P.mf+'px');
@@ -658,6 +677,7 @@ function renderTree(){
   const sx=stage.getBoundingClientRect().left, vw=document.documentElement.clientWidth;
   for(const p of L.placed){
     const n=p.item, t=THEME[n.status];
+    if(n.add){ stage.append(addTag(p,L,W)); continue; }
     const el=document.createElement('button');
     el.className=`tag ${n.status}`; el.dataset.id=n.id;
     el.setAttribute('aria-label',`Tag ${n.id}: ${n.need}. ${LABEL[n.status]}.`);
@@ -1144,6 +1164,13 @@ function fitTV(){
   stage.style.marginLeft=((box.clientWidth-stage.offsetWidth)/2)+'px';
   stage.style.marginTop=(top-bb.y*k+Math.max(0,(box.clientHeight-top-20*u-bb.height*k)/2))+'px';
 }
+function qrSVG(link){
+  if(!window.qrcode) return '';
+  const qr=qrcode(0,'M'); qr.addData(link); qr.make();
+  const n=qr.getModuleCount(); let d='';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) d+=`M${c} ${r}h1v1h-1z`;
+  return `<svg viewBox="-1 -1 ${n+2} ${n+2}" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="${d}" fill="#4A1A10"/></svg>`;
+}
 function cheer(){
   if(!JUST.size) return;
   for(const id of JUST){ const el=stage.querySelector(`.tag[data-id="${CSS.escape(id)}"]`); if(el){ el.classList.add('just'); setTimeout(()=>el.classList.remove('just'),4000); } }
@@ -1152,17 +1179,11 @@ function cheer(){
 if(TV){
   addEventListener('resize',()=>{ renderTree(); });
   document.fonts?.ready.then(fitTV);
-  const cards=[...document.querySelectorAll('.tvqr')];
-  cards[1].hidden=!(submissionsOpen()&&CONFIG.apiUrl);
   const sc=document.createElement('script'); sc.src='vendor/qrcode.js';
   sc.onload=()=>{
-    for(const q of cards){
-      const qr=qrcode(0,'M'); qr.addData(CONFIG[q.dataset.link]); qr.make();
-      const n=qr.getModuleCount(); let d='';
-      for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) d+=`M${c} ${r}h1v1h-1z`;
-      q.firstElementChild.innerHTML=`<svg viewBox="-1 -1 ${n+2} ${n+2}" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="${d}" fill="#4A1A10"/></svg>`;
-      requestAnimationFrame(()=>q.style.backgroundImage=ticketURL(q.offsetWidth,q.offsetHeight,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5}));
-    }
+    const q=document.getElementById('tvqr'); q.innerHTML=qrSVG(CONFIG.tvLink);
+    requestAnimationFrame(()=>q.style.backgroundImage=ticketURL(q.offsetWidth,q.offsetHeight,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5}));
+    renderTree();
   };
   document.head.append(sc);
   // keep the screen on, and reload every few hours to pick up any changes to the page
