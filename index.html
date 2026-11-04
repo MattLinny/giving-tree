@@ -336,10 +336,13 @@ html.tv .stage{width:1000px;margin:0;transform-origin:50% 0;pointer-events:none}
 html.tv .tvhead{display:flex;align-items:flex-start;gap:44px;position:absolute;top:44px;left:44px;right:44px;z-index:3}
 .tvqr{flex:none;width:300px;padding:26px 26px 20px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
 .tvqr svg{display:block;width:100%;height:auto}
-.tvqr span{display:block;margin-top:12px;font:800 17px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase}
+.tvqr span{display:block;margin-top:12px;font:800 15px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.tvl{flex:none;width:300px}
 .tvt{flex:1;min-width:0}
+.tvt .tvqr{margin:20px 0 0 auto}
+.tvqr[hidden]{display:none}
 .tvtitle{font:400 104px/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
-.tvcount{display:flex;flex-direction:column;align-items:flex-end;gap:12px;margin-top:24px}
+.tvcount{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:24px}
 .tvcount .chip{height:48px;padding:0 20px 0 14px;font-size:14px;cursor:default}
 .tvcount .chip b{font-size:20px}
 /* a tag that was just claimed cheers, then settles */
@@ -354,8 +357,8 @@ html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
 <body>
 <main class="wrap">
   <header class="tvhead" aria-hidden="true">
-    <div class="tvqr" id="tvqr"><div id="qr"></div><span>Scan to pick a tag</span></div>
-    <div class="tvt"><div class="tvtitle">Christmas<br>Giving Tree</div><div class="tvcount" id="tvcount"></div></div>
+    <div class="tvl"><div class="tvqr" data-link="tvLink"><div></div><span>Scan to pick a tag</span></div><div class="tvcount" id="tvcount"></div></div>
+    <div class="tvt"><div class="tvtitle">Christmas<br>Giving Tree</div><div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Scan to submit a need</span></div></div>
   </header>
   <section class="sec hero" id="s1">
     <header class="head"><div class="title" id="title"><h1><span>Christmas</span><span>Giving Tree</span></h1></div><p class="lede">Real needs from our community this Christmas. Pick a tag and help fill one.</p></header>
@@ -390,7 +393,9 @@ html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
 // ?tv turns this page into the Sunday TV display (add &rotate, or &rotate=left for the other way, if the screen is on its side but the computer isn't)
 const TV=/[?&]tv\b/.test(location.search);
 // ?pick opens straight on the tree (no intro), for people arriving from a QR code
-if(/[?&]pick\b/.test(location.search)) document.documentElement.classList.add('pick');
+// ?pick opens straight on the tags; ?submit does the same with the submission form open on top
+const SUBMIT=/[?&]submit\b/.test(location.search);
+if(SUBMIT||/[?&]pick\b/.test(location.search)) document.documentElement.classList.add('pick');
 if(TV) document.documentElement.classList.add('tv'), /[?&]rotate\b/.test(location.search)&&document.documentElement.classList.add('rot'), /[?&]rotate=left\b/.test(location.search)&&document.documentElement.classList.add('left');
 /* ───────── Config ───────── */
 const CONFIG = {
@@ -416,6 +421,7 @@ const CONFIG = {
   refreshMinutes: 5,
   // TV display: where the QR code sends people, and how often it checks the sheet for claims (seconds)
   tvLink: 'https://givingtree.oceansidechurch.ca/pick.html',   // opens straight on the tags
+  tvSubmitLink: 'https://givingtree.oceansidechurch.ca/submit.html',   // opens straight on the submission form
   tvRefreshSeconds: 15,
 };
 
@@ -1146,15 +1152,17 @@ function cheer(){
 if(TV){
   addEventListener('resize',()=>{ renderTree(); });
   document.fonts?.ready.then(fitTV);
-  const q=document.getElementById('tvqr');
-  q.style.backgroundImage=ticketURL(300,370,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5});
+  const cards=[...document.querySelectorAll('.tvqr')];
+  cards[1].hidden=!(submissionsOpen()&&CONFIG.apiUrl);
   const sc=document.createElement('script'); sc.src='vendor/qrcode.js';
   sc.onload=()=>{
-    const qr=qrcode(0,'M'); qr.addData(CONFIG.tvLink); qr.make();
-    const n=qr.getModuleCount(); let d='';
-    for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) d+=`M${c} ${r}h1v1h-1z`;
-    document.getElementById('qr').innerHTML=`<svg viewBox="-1 -1 ${n+2} ${n+2}" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="${d}" fill="#4A1A10"/></svg>`;
-    requestAnimationFrame(()=>q.style.backgroundImage=ticketURL(q.offsetWidth,q.offsetHeight,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5}));
+    for(const q of cards){
+      const qr=qrcode(0,'M'); qr.addData(CONFIG[q.dataset.link]); qr.make();
+      const n=qr.getModuleCount(); let d='';
+      for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) d+=`M${c} ${r}h1v1h-1z`;
+      q.firstElementChild.innerHTML=`<svg viewBox="-1 -1 ${n+2} ${n+2}" shape-rendering="crispEdges" role="img" aria-label="QR code"><path d="${d}" fill="#4A1A10"/></svg>`;
+      requestAnimationFrame(()=>q.style.backgroundImage=ticketURL(q.offsetWidth,q.offsetHeight,{fill:'#FFF4E2',stroke:'#C22A0F',r:16,d:10,sw:2.5}));
+    }
   };
   document.head.append(sc);
   // keep the screen on, and reload every few hours to pick up any changes to the page
@@ -1162,6 +1170,7 @@ if(TV){
   awake(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) awake(); });
   setTimeout(()=>location.reload(),6*3600*1000);
 }
+if(SUBMIT&&!TV&&submissionsOpen()&&CONFIG.apiUrl) openNeedForm(document.body);
 </script>
 </body>
 </html>
