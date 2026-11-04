@@ -334,14 +334,14 @@ html.tv #s3{height:100%;display:flow-root;padding:0;overflow:visible}
 html.tv .stage svg.tree.rv.in{translate:0 0}
 html.tv .stage{width:1000px;margin:0;transform-origin:50% 0;pointer-events:none}   /* drawn at the large size, then scaled to fit */
 html.tv .tvhead{display:flex;align-items:flex-start;gap:44px;position:absolute;top:44px;left:44px;right:44px;z-index:3}
-.tvqr{flex:none;width:300px;padding:26px 26px 20px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
+.tvqr{flex:none;width:236px;padding:20px 20px 15px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
 .tvqr svg{display:block;width:100%;height:auto}
-.tvqr span{display:block;margin-top:12px;font:800 15px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.tvl{flex:none;width:300px}
+.tvqr span{display:block;margin-top:9px;font:800 15px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.tvl{flex:none;width:236px}
 .tvt{flex:1;min-width:0}
 .tvt .tvqr{margin:20px 0 0 auto}
 .tvqr[hidden]{display:none}
-.tvtitle{font:400 104px/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
+.tvtitle{font:400 115px/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 .tvcount{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:24px}
 .tvcount .chip{height:48px;padding:0 20px 0 14px;font-size:14px;cursor:default}
 .tvcount .chip b{font-size:20px}
@@ -357,8 +357,8 @@ html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
 <body>
 <main class="wrap">
   <header class="tvhead" aria-hidden="true">
-    <div class="tvl"><div class="tvqr" data-link="tvLink"><div></div><span>Scan to pick a tag</span></div><div class="tvcount" id="tvcount"></div></div>
-    <div class="tvt"><div class="tvtitle">Christmas<br>Giving Tree</div><div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Scan to submit a need</span></div></div>
+    <div class="tvl"><div class="tvqr" data-link="tvLink"><div></div><span>Pick a tag</span></div><div class="tvcount" id="tvcount"></div></div>
+    <div class="tvt"><div class="tvtitle">Christmas<br>Giving Tree</div><div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Submit a need</span></div></div>
   </header>
   <section class="sec hero" id="s1">
     <header class="head"><div class="title" id="title"><h1><span>Christmas</span><span>Giving Tree</span></h1></div><p class="lede">Real needs from our community this Christmas. Pick a tag and help fill one.</p></header>
