@@ -333,18 +333,14 @@ html.tv #s1,html.tv #s2,html.tv .sec-head,html.tv .bar,html.tv .stk{display:none
 html.tv #s3{height:100%;display:flow-root;padding:0;overflow:visible}
 html.tv .stage svg.tree.rv.in{translate:0 0}
 html.tv .stage{width:1000px;margin:0;transform-origin:50% 0;pointer-events:none}   /* drawn at the large size, then scaled to fit */
-html.tv .tvhead{display:flex;align-items:flex-start;gap:44px;position:absolute;top:44px;left:44px;right:44px;z-index:3}
+html.tv .tvhead{display:block;position:absolute;top:calc(44px*var(--u,1));left:calc(44px*var(--u,1));width:992px;z-index:3;transform-origin:0 0;transform:scale(var(--u,1))}   /* laid out on a 1080-wide screen, then scaled to the real one */
+html.tv body{background-size:calc(750px*var(--u,1)) calc(750px*var(--u,1))}
 .tvqr{flex:none;width:236px;padding:20px 20px 15px;background-size:100% 100%;filter:drop-shadow(6px 8px 0 var(--red-deep));color:var(--red-ink);text-align:center}
 .tvqr svg{display:block;width:100%;height:auto}
 .tvqr span{display:block;margin-top:9px;font:800 15px/1.15 var(--wide);font-stretch:118%;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.tvl{flex:none;width:236px}
-.tvt{flex:1;min-width:0}
-.tvt .tvqr{margin:20px 0 0 auto}
+.tvqrs{display:flex;justify-content:space-between;margin-top:20px}
 .tvqr[hidden]{display:none}
-.tvtitle{font:400 115px/.86 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
-.tvcount{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:24px}
-.tvcount .chip{height:48px;padding:0 20px 0 14px;font-size:14px;cursor:default}
-.tvcount .chip b{font-size:20px}
+.tvtitle{width:max-content;white-space:nowrap;font:400 100px/.9 var(--display);letter-spacing:.005em;text-transform:uppercase;text-shadow:5px 6px 0 var(--red-deep)}
 /* a tag that was just claimed cheers, then settles */
 .tag.just{z-index:6;animation:sway var(--dur) ease-in-out var(--delay) infinite alternate,cheer 1.1s cubic-bezier(.3,1.5,.5,1) 0s 3;
   filter:drop-shadow(0 3px 0 rgba(6,36,24,.5)) drop-shadow(0 0 26px rgba(255,244,226,.85))}
@@ -357,8 +353,11 @@ html.tv.rot.left body{transform:rotate(-90deg) translateX(-100%)}
 <body>
 <main class="wrap">
   <header class="tvhead" aria-hidden="true">
-    <div class="tvl"><div class="tvqr" data-link="tvLink"><div></div><span>Pick a tag</span></div><div class="tvcount" id="tvcount"></div></div>
-    <div class="tvt"><div class="tvtitle">Christmas<br>Giving Tree</div><div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Submit a need</span></div></div>
+    <div class="tvtitle">Christmas Giving Tree</div>
+    <div class="tvqrs">
+      <div class="tvqr" data-link="tvLink"><div></div><span>Pick a tag</span></div>
+      <div class="tvqr" data-link="tvSubmitLink" hidden><div></div><span>Submit a need</span></div>
+    </div>
   </header>
   <section class="sec hero" id="s1">
     <header class="head"><div class="title" id="title"><h1><span>Christmas</span><span>Giving Tree</span></h1></div><p class="lede">Real needs from our community this Christmas. Pick a tag and help fill one.</p></header>
@@ -621,7 +620,6 @@ const SEEN=new Set();   // tags that have already popped in
 
 function renderBar(){
   const c={open:0,claimed:0,filled:0}; NEEDS.forEach(n=>c[n.status]++);
-  if(TV) document.getElementById('tvcount').innerHTML=['open','claimed','filled'].map(s=>`<span class="chip"><i class="${s}"></i><b>${c[s]}</b>${LABEL[s]}</span>`).join('');
   bar.innerHTML='';
   const chips=document.createElement('div'); chips.className='chips'; bar.append(chips);
   for(const s of ['open','claimed','filled']){
@@ -1136,13 +1134,15 @@ if(CONFIG.apiUrl||CONFIG.sheetCsvUrl) setInterval(()=>refresh(false),TV?CONFIG.t
 // fill the screen under the title: branch tips may run off the sides, the tags stay on screen
 function fitTV(){
   const box=document.getElementById('s3'), L=LAST_L, tree=stage.querySelector('svg.tree'); if(!L||!tree) return;
-  const head=document.querySelector('.tvhead'), title=document.querySelector('.tvtitle');
-  const top=head.offsetTop+title.offsetTop+title.offsetHeight+12, bb=tree.getBBox();
+  const u=box.clientWidth/1080, title=document.querySelector('.tvtitle');
+  document.documentElement.style.setProperty('--u',u);
+  title.style.fontSize='100px'; title.style.fontSize=100*992/title.offsetWidth+'px';   // the title spans the full width
+  const top=u*(44+title.offsetHeight+10), bb=tree.getBBox();
   const reach=Math.max(...L.placed.map(p=>Math.abs(p.x+L.P.T/2-L.cx)+L.P.T/2));
-  const k=Math.min(1.8,(box.clientHeight-top-20)/bb.height,(box.clientWidth/2-28)/reach);
+  const k=Math.min((box.clientHeight-top-20*u)/bb.height,(box.clientWidth/2-28*u)/reach);
   stage.style.scale=k.toFixed(3);
   stage.style.marginLeft=((box.clientWidth-stage.offsetWidth)/2)+'px';
-  stage.style.marginTop=(top-bb.y*k+Math.max(0,(box.clientHeight-top-20-bb.height*k)/2))+'px';
+  stage.style.marginTop=(top-bb.y*k+Math.max(0,(box.clientHeight-top-20*u-bb.height*k)/2))+'px';
 }
 function cheer(){
   if(!JUST.size) return;
